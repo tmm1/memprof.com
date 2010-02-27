@@ -1,0 +1,100 @@
+## import data
+
+mongoimport -h localhost -d memprof --drop -c rails --file full_heap.dump
+
+## connect
+
+mongo localhost/memprof
+
+## num objects
+
+db.rails.count()
+
+## count by type
+
+db.rails.group({ key: {type:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## count by string content (not working)
+
+db.rails.group({ cond: {type:'string',shared:{$exists:false}}, key: {data:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+db.rails.distinct('data', {type:'string',shared:{$exists:false}})
+
+## count by string content under 25 chars
+
+db.rails.group({ cond: {type:'string',shared:{$exists:false},length:{$lt:25}}, key: {data:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## count by string copies (not working)
+
+db.rails.group({ cond: {type:'string',shared:{$exists:true}}, key: {shared:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## list of class object names
+
+db.rails.distinct('name', {type:'class'})
+
+## classes count for all objects/data
+
+db.rails.group({ cond: {type:{$in:['object','data']}}, key: {class_name:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## group by node type
+
+db.rails.group({ cond: {type:'node'}, key: {node_type:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## hash size distribution
+
+db.rails.group({ cond: {type:'hash'}, key: {length:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## ids of all hashes that are 136 elements long
+
+db.rails.distinct('_id',{type:'hash',length:136})
+
+## group by regexp content
+
+db.rails.group({ cond: {type:'regexp'}, key: {data:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## array size distribution
+
+db.rails.group({ cond: {type:'array'}, key: {length:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## find ivar/constant names for an object
+
+db.rails.find({ivars:{$exists:true}, $where: function(){ var found = false; for(var k in this.ivars){ if (this.ivars[k] == "0x2de9c40") found=true }; return found }})
+
+## find local variable names for an object
+
+db.rails.find({type:'varmap', $where: "var found = false; for(var k in this.data){ if (this.data[k] == '0x3613638') found=true }; return found" })
+
+## count by file
+
+db.rails.group({ key: {file:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## count by line/type in a file
+
+db.rails.group({ cond: {file:"/custom/ree/lib/ruby/1.8/rexml/parsers/streamparser.rb"}, key: {line:true,type:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+db.rails.group({ cond: {file:"/home/aman/homerun/rails/app/controllers/accounts_controller.rb"}, key: {file:true,type:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+
+## count by source
+
+db.rails.group({ key: {source:true}, initial: {count:0}, reduce: function(doc,out){ out.count++ } })
+
+## find subclasses
+
+db.rails.find({super:"0x3cf2120"})
+db.rails.find({super:{$in:["0x53d8bf0","0x541fe60"]}})
+
+## find objects given source
+
+db.rails.find({type:"class",source: /rails\/app\/models/})
+
+
+__END__
+
+require 'memprof'
+trap('USR3'){
+  pid = Process.pid
+  fork{
+    Memprof.dump_all("/tmp/#{pid}-#{Time.now.to_i}.json")
+    exit!
+  }
+}
