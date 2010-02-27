@@ -1,0 +1,74 @@
+Linux
+  - tramp calls in C extensions in --enable-shared
+  - i386 "bug" with missing tramp to rb_newobj
+
+OSX
+  - tramp calls in --enable-shared (fix loop due to tramping own functions in memprof)
+  - what to do for leopard (#defines for mach_header vs mach_header_64)
+  - segfault with Brew ruby
+  - find type sizes and offsets (bin_type_size bin_type_member_offset)
+  - write code to get values from gdb (IO.popen)
+      
+Permutations
+  - shared vs static
+  - i386 vs x86_64
+  - stripped vs not
+  - linux vs osx
+  - ruby 1.8 vs 1.9
+  - O0 vs O1 vs O2 vs O3
+  - inlined add_freelist vs not
+  - universal binary vs not
+
+Variables
+  - sizeof(RVALUE)
+  - sizeof(struct heaps_slot)
+  - &rb_newobj [address of rb_newobj]
+  - &add_freelist
+  - &heaps
+  - &heaps_used
+  - &freelist
+  - (int)&(((struct heaps_slot *)0)->slot) [offset of slot inside struct heaps_slot]
+  - (int)&(((struct heaps_slot *)0)->limit)
+
+Ruby 1.9 Variables
+  - &rb_objspace
+  - 
+
+Tracking
+  - add support for libjudy
+  - time of object creation
+  - stack trace at object creation
+  - get rid of strdups for filenames
+  - dump out struct SCOPE and BLOCK structures as json
+
+Visualizations
+  - count by filename
+  - breakdown further by line/type/classname/hashsize/stringcontents
+  - stack visualizations for all threads and blocks
+
+Other Plugins
+  - tcmalloc equivalent of malloc_get_usable_size
+
+__END__
+
+aman-guptas-macbook-air:ext test$ gdb --interpreter=mi --quiet
+(gdb) 
+attach 11983
+&"attach 11983\n"
+~"Attaching to process 11983.\n"
+=shlibs-updated
+=shlibs-updated
+=shlibs-updated
+^done,thread-id="1"
+(gdb) 
+-data-evaluate-expression sizeof(RVALUE)
+^done,value="40",time={wallclock="0.01099",user="0.00264",system="0.00104",start="1266902077.091211",end="1266902077.102199"}
+(gdb) 
+-data-evaluate-expression sizeof(UNREAL)
+^error,msg="No symbol \"UNREAL\" in current context."
+(gdb) 
+quit
+&"quit\n"
+~"The program is running.  Quit anyway (and detach it)? (y or n) "
+y
+aman-guptas-macbook-air:ext test$ 
