@@ -1,0 +1,9 @@
+%ul
+  - list.each do |o|
+    %li
+      = names[o['_id']] || o['name']
+
+      - if o['hasChildren']
+        - where = Yajl.dump({:_id => o['_id']})
+        %ul{:url => "/namespace?where=#{where}"}
+          %img{:src => '/demo/spinner.gif'}

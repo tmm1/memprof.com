@@ -1,8 +1,11 @@
 %ul
   - list.each do |o|
     %li
+      / - if num = o['numInstances'] and num > 0
+      /   %span.num= num
+
       = o['name'] || "#&lt;Class:#{o['_id']}&gt;"
-      - if o['hasChildren']
+      - if o['hasSubclasses']
         - where = Yajl.dump({:_id => o['_id']})
         %ul{:url => "/classview?where=#{where}"}
           %img{:src => '/demo/spinner.gif'}
