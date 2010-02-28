@@ -3,6 +3,10 @@ require 'sequel'
 require 'date'
 require 'time'
 
+Sequel.extension :pretty_table
+Sequel::Model.plugin :hook_class_methods
+Sequel::Model.plugin :timestamps
+
 DB = Sequel.connect(ENV['DATABASE_URL'] || 'mysql://root@localhost/memprof')
 
 unless DB.table_exists? :emails
@@ -16,5 +20,4 @@ unless DB.table_exists? :emails
 end
 
 class Email < Sequel::Model(:emails)
-  before_create { self.created_at = Time.now }  
 end
