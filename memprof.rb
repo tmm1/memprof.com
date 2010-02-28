@@ -4,15 +4,14 @@ require 'sinatra/base'
 require 'haml'
 require 'db'
 
-class Memprof < Sinatra::Default
-
+class MemprofApp < Sinatra::Default
   get '/' do
-	haml :main
+    haml :main
   end
-  
- post '/email' do
-	Email.create(:email => params[:email_addr]) if params[:email_addr]
-	haml :thanks
+
+  post '/email' do
+    Email.create(:email => params[:email_addr]) if params[:email_addr]
+    haml :thanks
   end
 
 
@@ -24,6 +23,8 @@ class Memprof < Sinatra::Default
 
   set :server, 'thin'
   set :port, 7006
+  set :public, File.expand_path('../public', __FILE__)
+  enable :static
 end
 
-Memprof.run!
+MemprofApp.run!
