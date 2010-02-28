@@ -1,14 +1,18 @@
+General
+  - Tramp OBJSETUP instead of rb_newobj
+    * Need to analyze and figure out how to handle different uses and compilations
+  - User set-able options for tracking (when the features are supported..)
+  - Debug output
+
 Linux
   - tramp calls in C extensions in --enable-shared
   - i386 "bug" with missing tramp to rb_newobj
 
 OSX
-  - tramp calls in --enable-shared (fix loop due to tramping own functions in memprof)
-  - what to do for leopard (#defines for mach_header vs mach_header_64)
-  - segfault with Brew ruby
-  - find type sizes and offsets (bin_type_size bin_type_member_offset)
-  - write code to get values from gdb (IO.popen)
-      
+  - i386 - what to do for leopard (#defines for mach_header vs mach_header_64)
+  - find type sizes and offsets without GDB's help (lots of work, probably)
+  - investigate the possibility of hard-coding info for brew/system rubies
+
 Permutations
   - shared vs static
   - i386 vs x86_64
@@ -32,7 +36,6 @@ Variables
 
 Ruby 1.9 Variables
   - &rb_objspace
-  - 
 
 Tracking
   - add support for libjudy
@@ -40,6 +43,8 @@ Tracking
   - stack trace at object creation
   - get rid of strdups for filenames
   - dump out struct SCOPE and BLOCK structures as json
+  - sampling
+  - track only certain types (dependent on OBJSETUP tramping)
 
 Visualizations
   - count by filename
@@ -48,27 +53,3 @@ Visualizations
 
 Other Plugins
   - tcmalloc equivalent of malloc_get_usable_size
-
-__END__
-
-aman-guptas-macbook-air:ext test$ gdb --interpreter=mi --quiet
-(gdb) 
-attach 11983
-&"attach 11983\n"
-~"Attaching to process 11983.\n"
-=shlibs-updated
-=shlibs-updated
-=shlibs-updated
-^done,thread-id="1"
-(gdb) 
--data-evaluate-expression sizeof(RVALUE)
-^done,value="40",time={wallclock="0.01099",user="0.00264",system="0.00104",start="1266902077.091211",end="1266902077.102199"}
-(gdb) 
--data-evaluate-expression sizeof(UNREAL)
-^error,msg="No symbol \"UNREAL\" in current context."
-(gdb) 
-quit
-&"quit\n"
-~"The program is running.  Quit anyway (and detach it)? (y or n) "
-y
-aman-guptas-macbook-air:ext test$ 
