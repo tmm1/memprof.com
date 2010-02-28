@@ -19,7 +19,7 @@ class MemprofApp < Sinatra::Default
   end
 
   get '/test' do
-    partial :_groupview, :layout => (request.xhr? ? false : :ui)
+    partial :_testview, :layout => (request.xhr? ? false : :ui)
   end
 
   get '/classview' do
@@ -60,6 +60,18 @@ class MemprofApp < Sinatra::Default
     end
 
     partial :_namespace, :layout => (request.xhr? ? false : :ui), :list => classes, :names => names
+  end
+
+  get '/groupview' do
+    if key = params[:key]
+      where = params[:where] ? Yajl.load(params[:where]) : nil
+    else
+      key = 'file'
+      where = nil
+    end
+
+    list = $dump.db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }', true).sort_by{ |o| -o['count'] }
+    partial :_groupview, :layout => (request.xhr? ? false : :ui), :list => list, :key => key, :where => where
   end
 
   helpers do

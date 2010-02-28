@@ -1,11 +1,43 @@
-%ul
-  %li
-    hi
-    %ul
-      %img{:src => '/demo/spinner.gif'}
-  %li
-    none
-  %li
-    world
-    %ul
-      %img{:src => '/demo/spinner.gif'}
+%ul.grouped
+  - list.each do |o|
+    %li
+      %span.val
+        - case key
+        - when 'file'
+          - if f = o[key]
+            = f.split('/').last(4).join('/')
+          - else
+            (unknown)
+        - when 'line'
+          line
+          = o[key].to_i
+        - when 'length'
+          length
+          = o[key].to_i
+        - else
+          = o[key] || '(unknown)'
+
+      %span.num= o['count'].to_i
+
+      - w = (where || {}).merge(key => o[key])
+
+      - possible = %w[ type file ]
+
+      - case w['type']
+      - when 'string', 'hash', 'array'
+        - possible << 'length'
+        - possible << 'data' if w['type'] == 'string'
+      - when 'module', 'class'
+        - possible << 'name'
+      - when 'data', 'object'
+        - possible << 'class_name'
+      - when 'node'
+        - possible << 'node_type'
+
+      - possible << 'line'
+      - possible -= w.keys
+
+      - if possible.any?
+        - subkey = possible.first
+        %ul{:url => "/groupview?key=#{subkey}&where=#{Yajl.dump w}", :possible => possible.join(',')}
+          %img{:src => '/demo/spinner.gif'}

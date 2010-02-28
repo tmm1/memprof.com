@@ -7,11 +7,26 @@
       :sass
         body
           padding: 2em
+        li > span.num
+          color: #bbb
+          width: 50px
+          text-align: right
+
     %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'}
     %script{:type => 'text/javascript', :src => '/demo/jquery.treeview.js'}
     :javascript
       $(function(){
-        var tree = $('body > ul').treeview({
+        var tree = $('body > ul');
+        var left = 0;
+
+        if (tree.hasClass('grouped')) {
+          tree.css('margin-left', '45px');
+          var off = tree.offset();
+          left = off.left - 55;
+          $('span.num').css({position: 'absolute', left: left + 'px'});
+        }
+
+        tree.treeview({
           collapsed: true,
           animated: 'fast',
           prerendered: false,
@@ -28,6 +43,7 @@
               sublist.animate({height: '0'}, 'fast', function(){
                 sublist.remove();
                 var newlist = $(data);
+                newlist.find('span.num').css({position: 'absolute', left: left + 'px'});
                 newlist.css('display','none').appendTo($this);
                 tree.trigger('add', newlist);
                 newlist.animate({height:'toggle'}, 'fast');
