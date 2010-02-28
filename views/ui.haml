@@ -1,0 +1,38 @@
+!!!
+%html
+  %head
+    %link{:rel => 'stylesheet', :href => '/demo/jquery.treeview.css'}/
+    %style{:type => 'text/css'}
+      :sass
+        body
+          padding: 2em
+    %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'}
+    %script{:type => 'text/javascript', :src => '/demo/jquery.treeview.js'}
+    :javascript
+      $(function(){
+        var tree = $('body > ul').treeview({
+          collapsed: true,
+          animated: 'fast',
+          prerendered: false,
+          toggle: function(){
+            var $this = $(this);
+            if ($this.hasClass('loaded'))
+              return;
+
+            $this.addClass('loaded');
+
+            $.get('/test', function(data){
+              var sublist = $this.find('>ul');
+              sublist.animate({height: '0'}, 'fast', function(){
+                sublist.remove();
+                var newlist = $(data);
+                newlist.css('display','none').appendTo($this);
+                tree.trigger('add', newlist);
+                newlist.animate({height:'toggle'}, 'fast');
+              });
+            });
+          }
+        });
+      });
+  %body
+    = yield
