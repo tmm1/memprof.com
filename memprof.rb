@@ -15,16 +15,12 @@ class MemprofApp < Sinatra::Default
   end
 
   get '/test' do
-    if request.xhr?
-      partial :_groupview
-    else
-      haml :_groupview, :layout => :ui
-    end
+    partial :_groupview, :layout => (request.xhr? ? false : :ui)
   end
 
   helpers do
     def partial name, locals = {}
-      haml name, :layout => false, :locals => locals
+      haml name, :layout => locals.delete(:layout) || false, :locals => locals
     end
   end
 
