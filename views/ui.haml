@@ -21,9 +21,10 @@
               return;
 
             $this.addClass('loaded');
+            var sublist = $this.find('>ul');
+            var url = sublist.attr('url') || '/test';
 
-            $.get('/test', function(data){
-              var sublist = $this.find('>ul');
+            $.get(url, function(data){
               sublist.animate({height: '0'}, 'fast', function(){
                 sublist.remove();
                 var newlist = $(data);

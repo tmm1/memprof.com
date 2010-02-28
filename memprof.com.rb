@@ -12,11 +12,12 @@ module Memprof
       @db.create_index(:type)
       @db.create_index(:super)
       @db.create_index(:file)
+      @root_object = @db.find_one(:type => 'class', :name => 'Object')
     end
-    attr_reader :db
+    attr_reader :db, :root_object
 
     def subclasses_of(klass = nil, type = 'class')
-      klass ||= @db.find_one(:type => 'class', :name => 'Object')
+      klass ||= root_object
       subclasses = []
       process_children = proc{ |obj_id| 
         children = @db.find(:super => obj_id)
@@ -30,6 +31,24 @@ module Memprof
       }
       process_children.call(klass['_id'])
       subclasses
+    end
+
+    def subclasses_of?(klass = nil, type = 'class')
+      klass ||= root_object
+      subclasses = []
+      process_children = proc{ |obj_id| 
+        children = @db.find(:super => obj_id)
+        children.each do |child|
+          if child['type'] == type
+            subclasses << child
+            break
+          else
+            process_children.call(child['_id'])
+          end
+        end
+      }
+      process_children.call(klass['_id'])
+      subclasses.any?
     end
 
     def submodules_of(klass = nil)
@@ -305,6 +324,8 @@ module Memprof
     end
   end
 end
+
+__END__
 
 dump = Memprof::Dump.new(:hr)
 dump.filename_treeview
