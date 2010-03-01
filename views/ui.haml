@@ -13,6 +13,13 @@
           text-align: right
         table.info
           margin-bottom: 1.25em
+          a
+            text-decoration: none
+            color: #33d
+            &:visited
+              color: #33d
+            &:hover
+              text-decoration: none
           td.key
             text-align: right
             font-weight: bold
@@ -20,6 +27,10 @@
             width: 250px
           td.addr
             padding-right: 1em
+            width: 70px
+            &.left
+              padding-right: 0
+              padding-left: 1em
             a
               color: #aaa
               text-decoration: none
@@ -27,11 +38,6 @@
                 color: #aaa
           td.val
             a
-              text-decoration: none
-              color: #33d
-              &:visited
-                color: #33d
-                text-decoration: none
               &:hover
                 font-weight: bold
 

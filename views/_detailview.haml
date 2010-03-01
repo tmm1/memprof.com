@@ -10,7 +10,8 @@
   %table.info.hash_data
     - list.sort_by{|k,v| k}.each do |key,val|
       %tr
-        %td.key= key
+        %td.key= show_val key
+        %td.addr.left= show_addr key
         %td.addr= show_addr val
         %td.val= show_val val
 
