@@ -1,6 +1,6 @@
 %table.info
   - obj.each do |key,val|
-    - unless %w[ ivars methods ].include?(key) or (obj['type'] != 'string' and key == 'data')
+    - unless %w[ ivars methods ].include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
         %td.addr= show_addr val

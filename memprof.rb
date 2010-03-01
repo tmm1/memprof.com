@@ -125,6 +125,9 @@ class MemprofApp < Sinatra::Default
             o = $dump.db.find_one(:_id => parent)
             o['data'].dump
           end
+        when 'float'
+          num = obj['data']
+          "#&lt;Float value=#{num}>"
         when 'hash', 'array'
           "#&lt;#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
         when 'data', 'object'
