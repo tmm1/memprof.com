@@ -84,6 +84,16 @@ class MemprofApp < Sinatra::Default
     partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => obj
   end
 
+  get '/listview' do
+    if where = params[:where]
+      list = $dump.db.find(Yajl.load where)
+    else
+      list = $dump.db.find(:type => 'class')
+    end
+
+    partial :_listview, :layout => (request.xhr? ? false : :ui), :list => list
+  end
+
   helpers do
     def partial name, locals = {}
       haml name, :layout => locals.delete(:layout) || false, :locals => locals

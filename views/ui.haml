@@ -11,31 +11,32 @@
           color: #bbb
           width: 50px
           text-align: right
+        a
+          text-decoration: none
+          color: #33d
+          &:visited
+            color: #33d
+          &:hover
+            text-decoration: none
+        td.addr
+          font-family: monospace, courier
+          text-align: center
+          padding-right: 1em
+          a
+            color: #aaa
+            text-decoration: none
+            &:hover
+              color: #aaa
         table.info
           margin-bottom: 1.25em
-          a
-            text-decoration: none
-            color: #33d
-            &:visited
-              color: #33d
-            &:hover
-              text-decoration: none
           td.key
             text-align: right
             font-weight: bold
             padding-right: 1em
             width: 250px
           td.addr
-            padding-right: 1em
-            width: 70px
             &.left
-              padding-right: 0
               padding-left: 1em
-            a
-              color: #aaa
-              text-decoration: none
-              &:hover
-                color: #aaa
           td.val
             a
               &:hover

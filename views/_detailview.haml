@@ -6,13 +6,21 @@
         %td.addr= show_addr val
         %td.val= show_val val
 
+  - if obj['type'] == 'class'
+    - instances = $dump.db.find(:class => obj['_id']).count
+    %tr
+      %td.key instances
+      %td.addr &nbsp;
+      %td.val
+        %a{:href => "/listview?where=#{Yajl.dump :class => obj['_id']}"}= instances
+
 - if obj['type'] == 'hash' and list = obj['data'] and list.any?
   %table.info.hash_data
     - list.sort_by{|k,v| k}.each do |key,val|
       %tr
         %td.key= show_val key
         %td.addr.left= show_addr key
-        %td.addr= show_addr val
+        %td.addr.right= show_addr val
         %td.val= show_val val
 
 - if obj['type'] == 'array' and list = obj['data'] and list.any?
@@ -25,7 +33,16 @@
 
 - if list = obj['ivars']
   - ivars, rest = list.partition{ |k,v| k =~ /^@\w/ }
-  - cvars, constants = rest.partition{ |k,v| k =~ /^@/ }
+  - cvars, rest = rest.partition{ |k,v| k =~ /^@/ }
+  - internal, constants = rest.partition{ |k,v| k =~ /^__/ }
+
+  - if internal.any?
+    %table.info.internal
+      - internal.sort_by{|k,v| k}.each do |key,val|
+        %tr
+          %td.key= key
+          %td.addr= show_addr val
+          %td.val= show_val val
 
   - if ivars.any?
     %table.info.ivars
