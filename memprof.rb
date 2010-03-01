@@ -112,7 +112,7 @@ class MemprofApp < Sinatra::Default
       when /^0x/
         obj = $dump.db.find_one(:_id => val)
         show = case obj['type']
-        when 'class', 'module'
+        when 'class', 'module', 'iclass'
           if name = obj['name']
             "#{name}"
           else

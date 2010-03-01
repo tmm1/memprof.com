@@ -14,6 +14,13 @@
       %td.val
         %a{:href => "/listview?where=#{Yajl.dump :class => obj['_id']}"}= instances
 
+    - subclasses = $dump.db.find(:super => obj['_id']).count
+    %tr
+      %td.key subclasses
+      %td.addr &nbsp;
+      %td.val
+        %a{:href => "/listview?where=#{Yajl.dump :super => obj['_id']}"}= subclasses
+
 - if obj['type'] == 'hash' and list = obj['data'] and list.any?
   %table.info.hash_data
     - list.sort_by{|k,v| k}.each do |key,val|
