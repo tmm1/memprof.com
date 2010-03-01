@@ -25,6 +25,7 @@
 
       - case w['type']
       - when 'string', 'hash', 'array'
+        - possible << 'line'
         - possible << 'length'
         - possible << 'data' if w['type'] == 'string'
       - when 'module', 'class'
@@ -36,6 +37,7 @@
 
       - possible << 'line'
       - possible -= w.keys
+      - possible.uniq!
 
       - if possible.any?
         - subkey = possible.first

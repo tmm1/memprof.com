@@ -74,9 +74,29 @@ class MemprofApp < Sinatra::Default
     partial :_groupview, :layout => (request.xhr? ? false : :ui), :list => list, :key => key, :where => where
   end
 
+  get '/detailview' do
+    if where = params[:where]
+      obj = $dump.db.find_one(Yajl.load where)
+    else
+      obj = $dump.root_object
+    end
+
+    partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => obj
+  end
+
   helpers do
     def partial name, locals = {}
       haml name, :layout => locals.delete(:layout) || false, :locals => locals
+    end
+    def show_val val
+      case val
+      when nil
+        'nil'
+      when /^0x/
+        "<a href='/detailview?where=#{Yajl.dump :_id => val}'>#{val}</a>"
+      else
+        val
+      end
     end
   end
 
