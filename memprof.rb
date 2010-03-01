@@ -88,12 +88,44 @@ class MemprofApp < Sinatra::Default
     def partial name, locals = {}
       haml name, :layout => locals.delete(:layout) || false, :locals => locals
     end
+    def show_addr val
+      if val =~ /^0x/
+        "<a href='/detailview?where=#{Yajl.dump :_id => val}'>#{val}</a>"
+      else
+        '&nbsp;'
+      end
+    end
     def show_val val
       case val
       when nil
         'nil'
       when /^0x/
-        "<a href='/detailview?where=#{Yajl.dump :_id => val}'>#{val}</a>"
+        obj = $dump.db.find_one(:_id => val)
+        show = case obj['type']
+        when 'class', 'module'
+          if name = obj['name']
+            "#{name}"
+          else
+            "#&lt;#{obj['type'] == 'class' ? 'Class' : 'Module'}:#{val}>"
+          end
+        when 'string'
+          if str = obj['data']
+            str.dump
+          elsif parent = obj['shared']
+            o = $dump.db.find_one(:_id => parent)
+            o['data'].dump
+          end
+        when 'hash', 'array'
+          "#&lt;#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
+        when 'data', 'object'
+          "#&lt;#{obj['class_name'] || 'Object'}:#{obj['_id']}>"
+        when 'node'
+          "node:#{obj['node_type']}"
+        else
+          val
+        end
+
+        "<a href='/detailview?where=#{Yajl.dump :_id => val}'>#{show}</a>"
       else
         val
       end

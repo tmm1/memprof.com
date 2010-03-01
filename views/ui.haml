@@ -18,6 +18,22 @@
             font-weight: bold
             padding-right: 1em
             width: 250px
+          td.addr
+            padding-right: 1em
+            a
+              color: #aaa
+              text-decoration: none
+              &:hover
+                color: #aaa
+          td.val
+            a
+              text-decoration: none
+              color: #33d
+              &:visited
+                color: #33d
+                text-decoration: none
+              &:hover
+                font-weight: bold
 
     %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'}
     %script{:type => 'text/javascript', :src => '/demo/jquery.treeview.js'}

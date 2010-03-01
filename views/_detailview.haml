@@ -3,6 +3,7 @@
     - unless %w[ ivars methods ].include?(key) or (obj['type'] != 'string' and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
+        %td.addr= show_addr val
         %td.val= show_val val
 
 - if obj['type'] == 'hash' and list = obj['data'] and list.any?
@@ -10,6 +11,7 @@
     - list.sort_by{|k,v| k}.each do |key,val|
       %tr
         %td.key= key
+        %td.addr= show_addr val
         %td.val= show_val val
 
 - if obj['type'] == 'array' and list = obj['data'] and list.any?
@@ -17,6 +19,7 @@
     - list.each_with_index do |val,key|
       %tr
         %td.key= key
+        %td.addr= show_addr val
         %td.val= show_val val
 
 - if list = obj['ivars']
@@ -28,6 +31,7 @@
       - ivars.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
+          %td.addr= show_addr val
           %td.val= show_val val
 
   - if cvars.any?
@@ -35,6 +39,7 @@
       - cvars.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
+          %td.addr= show_addr val
           %td.val= show_val val
 
   - if constants.any?
@@ -42,6 +47,7 @@
       - constants.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
+          %td.addr= show_addr val
           %td.val= show_val val
 
 - if list = obj['methods']
@@ -49,4 +55,5 @@
     - list.sort_by{|k,v| k}.each do |key,val|
       %tr
         %td.key= key
+        %td.addr= show_addr val
         %td.val= show_val val
