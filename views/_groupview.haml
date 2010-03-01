@@ -1,25 +1,26 @@
 %ul.grouped
   - list.each do |o|
     %li
+      - w = (where || {}).merge(key => o[key])
+
       %span.val
-        - case key
-        - when 'file'
-          - if f = o[key]
-            = f.split('/').last(4).join('/')
+        %a{:href => "/listview?where=#{Yajl.dump w}"}
+          - case key
+          - when 'file'
+            - if f = o[key]
+              = f.split('/').last(4).join('/')
+            - else
+              (unknown)
+          - when 'line'
+            line
+            = o[key].to_i
+          - when 'length'
+            length
+            = o[key].to_i
           - else
-            (unknown)
-        - when 'line'
-          line
-          = o[key].to_i
-        - when 'length'
-          length
-          = o[key].to_i
-        - else
-          = o[key] || '(unknown)'
+            = o[key] || '(unknown)'
 
       %span.num= o['count'].to_i
-
-      - w = (where || {}).merge(key => o[key])
 
       - possible = %w[ type file ]
 

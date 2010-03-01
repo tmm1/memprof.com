@@ -35,7 +35,6 @@ class MemprofApp < Sinatra::Default
     subclasses.compact!
     subclasses.each do |o|
       o['hasSubclasses'] = $dump.subclasses_of?(o)
-      # o['numInstances'] = $dump.db.find(:type => 'object', :class => o['_id']).count
     end
 
     partial :_classview, :layout => (request.xhr? ? false : :ui), :list => subclasses
@@ -91,6 +90,7 @@ class MemprofApp < Sinatra::Default
       list = $dump.db.find(:type => 'class')
     end
 
+    # TODO: this needs pagination BIG TIME
     partial :_listview, :layout => (request.xhr? ? false : :ui), :list => list
   end
 
