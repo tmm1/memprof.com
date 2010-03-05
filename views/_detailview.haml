@@ -1,6 +1,6 @@
 %table.info
   - obj.each do |key,val|
-    - unless %w[ ivars methods ].include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
+    - unless %w[ ivars methods variables ].include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
         %td.addr= show_addr val
@@ -29,6 +29,15 @@
       %td.addr &nbsp;
       %td.val
         %a{:href => "/listview?where=#{Yajl.dump :super => obj['_id']}"}= subclasses
+
+- if obj['type'] == 'scope' and list = obj['variables'] and list.any?
+  %table.info.variables
+    - list.each do |key,val|
+      %tr
+        %td.key= show_val key
+        %td.addr.left= show_addr key
+        %td.addr.right= show_addr val
+        %td.val= show_val val
 
 - if obj['type'] == 'hash' and list = obj['data'] and list.any?
   %table.info.hash_data

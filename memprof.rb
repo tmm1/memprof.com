@@ -134,6 +134,10 @@ class MemprofApp < Sinatra::Default
           "#&lt;#{obj['class_name'] || 'Object'}:#{obj['_id']}>"
         when 'node'
           "node:#{obj['node_type']}"
+        when 'scope'
+          vars = obj['variables']
+          vars = obj['variables'].keys - ['_','~'] if vars
+          "#&lt;Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         else
           val
         end
