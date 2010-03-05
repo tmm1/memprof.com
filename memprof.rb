@@ -61,6 +61,18 @@ class MemprofApp < Sinatra::Default
     partial :_namespace, :layout => (request.xhr? ? false : :ui), :list => classes, :names => names
   end
 
+  get '/inbound_refs' do
+    if root = params[:root]
+      list = [$dump.db.find_one(Yajl.load root)]
+    elsif where = params[:where]
+      list = $dump.refs.find(Yajl.load where)
+    else
+      list = []
+    end
+
+    partial :_inbound_refs, :layout => (request.xhr? ? false : :ui), :list => list
+  end
+
   get '/groupview' do
     if key = params[:key]
       where = params[:where] ? Yajl.load(params[:where]) : nil

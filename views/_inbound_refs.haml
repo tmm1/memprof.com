@@ -1,0 +1,9 @@
+%ul
+  - list.each do |o|
+    %li
+      %a{:href => "/detailview?where=#{Yajl.dump :_id => o['_id']}"}= show_val o['_id']
+
+      - if o['_id'] != $dump.root_object['_id'] && $dump.refs.find_one(:refs => o['_id'])
+        - where = Yajl.dump({:refs => o['_id']})
+        %ul{:url => "/inbound_refs?where=#{where}"}
+          %img{:src => '/demo/spinner.gif'}

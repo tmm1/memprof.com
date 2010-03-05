@@ -8,13 +8,19 @@ module Memprof
   class Dump
     def initialize(collection_name)
       @connection = Mongo::Connection.new
+
       @db = @connection.db('memprof').collection(collection_name.to_s)
       @db.create_index(:type)
       @db.create_index(:super)
       @db.create_index(:file)
+      @db.create_index(:class)
+
+      @refs = @connection.db('memprof').collection("#{collection_name}_refs")
+      @refs.create_index(:refs)
+
       @root_object = @db.find_one(:type => 'class', :name => 'Object')
     end
-    attr_reader :db, :root_object
+    attr_reader :db, :refs, :root_object
 
     def subclasses_of(klass = nil, type = 'class')
       klass ||= root_object
