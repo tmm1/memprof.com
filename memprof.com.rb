@@ -62,11 +62,11 @@ module Memprof
     end
 
     def ancestors_of(obj)
-      ancestors = [obj['name']]
+      ancestors = []
 
       while s = obj['super']
         obj = @db.find_one(:_id => s)
-        ancestors << obj['name']
+        ancestors << obj
       end
 
       ancestors

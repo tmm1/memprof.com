@@ -7,6 +7,15 @@
         %td.val= show_val val
 
   - if obj['type'] == 'class'
+    - ancestors = $dump.ancestors_of(obj) and ancestors.any?
+    %tr
+      %td.key ancestors
+      %td.addr &nbsp;
+      %td.val
+        - num = ancestors.size
+        - ancestors.each_with_index do |o,i|
+          <a href="/listview?where=#{Yajl.dump :super => o['_id']}">#{show_val o['_id']}</a>#{num!=i+1 ? ',' : ''}
+
     - instances = $dump.db.find(:class => obj['_id']).count
     %tr
       %td.key instances
