@@ -121,8 +121,13 @@ class MemprofApp < Sinatra::Default
       case val
       when nil
         'nil'
-      when /^0x/
-        obj = $dump.db.find_one(:_id => val)
+      when OrderedHash, /^0x/
+        if val.is_a?(OrderedHash)
+          obj = val
+        else
+          obj = $dump.db.find_one(:_id => val)
+        end
+
         show = case obj['type']
         when 'class', 'module', 'iclass'
           if name = obj['name']

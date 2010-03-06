@@ -2,5 +2,4 @@
   - list.each do |o|
     %tr
       %td.addr= show_addr o['_id']
-      -# TODO: show_val does its own lookup, refactor
-      %td.val= show_val o['_id']
+      %td.val= show_val o
