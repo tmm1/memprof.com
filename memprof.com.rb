@@ -256,7 +256,7 @@ module Memprof
         ]
         outer = true
 
-        files = @db.group(key, cond, {:count=>0}, 'function(d,o){ o.count++ }', true)
+        files = @db.group(key, cond, {:count=>0}, 'function(d,o){ o.count++ }')
         files = files.sort_by{ |obj| -obj['count'] }
 
         list = files
@@ -313,7 +313,7 @@ module Memprof
         puts "<span style='float:right'>#{obj['count'].to_i}</span>"
 
         if k
-          objs = @db.group([k], c, {:count=>0}, 'function(d,o){ o.count++ }', true).sort_by{ |obj| -obj['count'] }
+          objs = @db.group([k], c, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |obj| -obj['count'] }
           if objs.any?
             objs.reject!{ |o| o['count'] < 50 } if k == :line
             filename_treeview(objs, [k], c)
@@ -352,15 +352,15 @@ dump = Memprof::Dump.new(:rails)
 p [dump.db.count, 'objects total']
 p [dump.db.find(:type => 'class').count, 'classes']
 
-files = dump.db.group([:file], nil, {:count=>0}, 'function(d,o){ o.count++ }', true)
+files = dump.db.group([:file], nil, {:count=>0}, 'function(d,o){ o.count++ }')
 files = files.map{ |obj| [obj['file'], obj['count']] }.sort_by{ |file,num| -num.to_i }
 files.each{ |file,num| puts "% 8d %s" % [num, file || '(unknown)'] }
 
-lines = dump.db.group([:line], {:file => '/home/aman/homerun/rails/app/controllers/accounts_controller.rb'}, {:count=>0}, 'function(d,o){ o.count++ }', true)
+lines = dump.db.group([:line], {:file => '/home/aman/homerun/rails/app/controllers/accounts_controller.rb'}, {:count=>0}, 'function(d,o){ o.count++ }')
 lines = lines.map{ |obj| [obj['line'], obj['count']] }.sort_by{ |line,num| -num.to_i }
 lines.each{ |line,num| puts "% 8d %d" % [num, line] }
 
-types = dump.db.group([:type], {:file => '/home/aman/homerun/rails/app/controllers/accounts_controller.rb'}, {:count=>0}, 'function(d,o){ o.count++ }', true)
+types = dump.db.group([:type], {:file => '/home/aman/homerun/rails/app/controllers/accounts_controller.rb'}, {:count=>0}, 'function(d,o){ o.count++ }')
 types = types.map{ |obj| [obj['type'], obj['count']] }.sort_by{ |line,num| -num.to_i }
 types.each{ |type,num| puts "% 8d %s" % [num, type] }
 

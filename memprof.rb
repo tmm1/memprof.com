@@ -81,7 +81,7 @@ class MemprofApp < Sinatra::Default
       where = nil
     end
 
-    list = $dump.db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }', true).sort_by{ |o| -o['count'] }
+    list = $dump.db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }
     partial :_groupview, :layout => (request.xhr? ? false : :ui), :list => list, :key => key, :where => where
   end
 
