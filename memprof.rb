@@ -156,10 +156,10 @@ class MemprofApp < Sinatra::Default
           vars = obj['variables'].keys - ['_','~'] if vars
           "#&lt;Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         else
-          val
+          obj['_id']
         end
 
-        "<a href='/detailview?where=#{Yajl.dump :_id => val}'>#{show}</a>"
+        "<a href='/detailview?where=#{Yajl.dump :_id => obj['_id']}'>#{show}</a>"
       else
         val
       end
