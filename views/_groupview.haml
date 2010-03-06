@@ -38,6 +38,7 @@
 
       - possible << 'line'
       - possible -= w.keys
+      - possible -= %w[type] if w.has_key?('class_name')
       - possible.uniq!
 
       - if possible.any?
