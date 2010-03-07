@@ -8,27 +8,28 @@
 
   - if obj['type'] == 'class'
     - ancestors = $dump.ancestors_of(obj) and ancestors.any?
+    - num = ancestors.size
     %tr
       %td.key ancestors
       %td.addr &nbsp;
       %td.val
-        - num = ancestors.size
-        - ancestors.each_with_index do |o,i|
-          <a href="/listview?where=#{Yajl.dump :super => o['_id']}">#{show_val o['_id']}</a>#{num!=i+1 ? ',' : ''}
+        - ancestors.each_with_index do |a, i|
+          %a{:href => "/detailview?where=#{Yajl.dump :super => a['_id']}"}= show_val a['_id']
+          %br/
 
     - instances = $dump.db.find(:class => obj['_id']).count
     %tr
       %td.key instances
       %td.addr &nbsp;
       %td.val
-        %a{:href => "/listview?where=#{Yajl.dump :class => obj['_id']}"}= instances
+        %a{:href => "/detailview?where=#{Yajl.dump :class => obj['_id']}"}= instances
 
     - subclasses = $dump.db.find(:super => obj['_id']).count
     %tr
       %td.key subclasses
       %td.addr &nbsp;
       %td.val
-        %a{:href => "/listview?where=#{Yajl.dump :super => obj['_id']}"}= subclasses
+        %a{:href => "/detailview?where=#{Yajl.dump :super => obj['_id']}"}= subclasses
 
 - if obj['type'] == 'scope' and list = obj['variables'] and list.any?
   %table.info.variables

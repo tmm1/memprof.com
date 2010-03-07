@@ -87,20 +87,19 @@ class MemprofApp < Sinatra::Default
 
   get '/detailview' do
     if where = params[:where]
-      obj = $dump.db.find_one(Yajl.load where)
-    else
-      obj = $dump.root_object
-    end
-
-    partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => obj
-  end
-
-  get '/listview' do
-    if where = params[:where]
       list = $dump.db.find(Yajl.load where)
     else
-      list = $dump.db.find(:type => 'class')
+      list = [$dump.root_object]
     end
+
+    if list.count == 0
+      haml 'no matching objects', :layout => (request.xhr? ? false : :ui)
+    elsif list.count == 1
+      partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => list.first
+    else
+      partial :_listview, :layout => (request.xhr? ? false : :ui), :list => list
+    end
+  end
 
     # TODO: this needs pagination BIG TIME
     partial :_listview, :layout => (request.xhr? ? false : :ui), :list => list
