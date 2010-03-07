@@ -117,7 +117,7 @@ class MemprofApp < Sinatra::Default
         '&nbsp;'
       end
     end
-    def show_val val
+    def show_val val, as_link = true
       case val
       when nil
         'nil'
@@ -132,8 +132,10 @@ class MemprofApp < Sinatra::Default
         when 'class', 'module', 'iclass'
           if name = obj['name']
             "#{name}"
+          elsif obj['ivars'] and attached = obj['ivars']['__attached__']
+            "#&lt;MetaClass:#{show_val attached, false}>"
           else
-            "#&lt;#{obj['type'] == 'class' ? 'Class' : 'Module'}:#{val}>"
+            "#&lt;#{obj['type'] == 'class' ? 'Class' : 'Module'}:#{obj['_id']}>"
           end
         when 'string'
           if str = obj['data']
@@ -155,11 +157,17 @@ class MemprofApp < Sinatra::Default
           vars = obj['variables']
           vars = obj['variables'].keys - ['_','~'] if vars
           "#&lt;Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
+        when 'file'
+          "#&lt;File:#{obj['_id']}>"
         else
           obj['_id']
         end
 
-        "<a href='/detailview?where=#{Yajl.dump :_id => obj['_id']}'>#{show}</a>"
+        if as_link
+          "<a href='/detailview?where=#{Yajl.dump :_id => obj['_id']}'>#{show}</a>"
+        else
+          show
+        end
       else
         val
       end
