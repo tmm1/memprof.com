@@ -1,10 +1,16 @@
 %table.info
   - obj.each do |key,val|
-    - unless %w[ ivars methods variables ].include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
+    - unless %w[ code node_code super_name class_name hasSubclasses name ivars methods variables ].include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
         %td.addr= show_addr val
         %td.val= show_val val
+
+  - if metaclass = $dump.db.find_one('ivars.__attached__' => obj['_id'])
+    %tr
+      %td.key metaclass
+      %td.addr= show_addr metaclass['_id']
+      %td.val= show_val metaclass
 
   - if obj['type'] == 'class'
     - ancestors = $dump.ancestors_of(obj) and ancestors.any?
