@@ -4,7 +4,11 @@
       %tr
         %td.key= key == '_id' ? 'address' : key
         %td.addr= show_addr val
-        %td.val= show_val val
+        - if %w[ file type ].include?(key)
+          %td.val
+            %a{:href => "/detailview?where=#{Yajl.dump key => val}"}= val
+        - else
+          %td.val= show_val val
 
   - if metaclass = $dump.db.find_one('ivars.__attached__' => obj['_id'])
     %tr
