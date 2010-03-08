@@ -206,7 +206,7 @@ $(function(){
   $('div.panel ul.nav li.group select.group_key').live('change', function(){
     var select = $(this);
     var link = select.parents('a:first');
-    link.attr('href', link.attr('href').replace(/&key=\w+?/,'') + "&key=" + select.val());
+    link.attr('href', link.attr('href').replace(/&key=.*$/,'') + "&key=" + select.val());
     link.click();
   });
 });

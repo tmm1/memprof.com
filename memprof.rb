@@ -89,6 +89,8 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/groupview' do
+    params[:key] = nil if params[:key] and params[:key].empty?
+
     if where = params[:where] and !where.empty?
        where = Yajl.load(where)
        key = params[:key] || possible_groupings_for(where).first

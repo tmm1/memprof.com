@@ -17,6 +17,14 @@
           - when 'length'
             length
             = o[key].to_i
+          - when 'data'
+            - if w['type'] == 'string'
+              - if o[key].nil?
+                = '(shared)'
+              - else
+                = h o[key].dump
+            - else
+              = o[key] || '(unknown)'
           - else
             = o[key] || '(unknown)'
 

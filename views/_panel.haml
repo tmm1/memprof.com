@@ -40,7 +40,7 @@
 
       - if where.empty? or num > 1
         %li.group
-          %a{:href => '/panel?subview=group&where='+where, :class => subview == 'group' && 'selected'}
+          %a{:href => "/panel?subview=group&where=#{where}&key=#{params[:key]}", :class => subview == 'group' && 'selected'}
             group
             - if subview == 'group'
               by
