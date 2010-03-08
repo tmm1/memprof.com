@@ -50,8 +50,8 @@
       %td.val
         %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => obj['_id']}"}= subclasses
 
-- if obj['type'] == 'scope' and list = obj['variables'] and list.any?
-  %table.info.variables
+  - if obj['type'] == 'scope' and list = obj['variables'] and list.any?
+    %tr.spacer.variables
     - list.each do |key,val|
       %tr
         %td.key= show_val key
@@ -59,8 +59,8 @@
         %td.addr.right= show_addr val
         %td.val= show_val val
 
-- if obj['type'] == 'hash' and list = obj['data'] and list.any?
-  %table.info.hash_data
+  - if obj['type'] == 'hash' and list = obj['data'] and list.any?
+    %tr.spacer.hash_data
     - list.sort_by{|k,v| k}.first(50).each do |key,val|
       %tr
         %td.key= show_val key
@@ -68,53 +68,53 @@
         %td.addr.right= show_addr val
         %td.val= show_val val
 
-- if obj['type'] == 'array' and list = obj['data'] and list.any?
-  %table.info.array_data
+  - if obj['type'] == 'array' and list = obj['data'] and list.any?
+    %tr.spacer.array_data
     - list.each_with_index do |val,key|
       %tr
         %td.key= key
         %td.addr= show_addr val
         %td.val= show_val val
 
-- if list = obj['ivars']
-  - ivars, rest = list.partition{ |k,v| k =~ /^@\w/ }
-  - cvars, rest = rest.partition{ |k,v| k =~ /^@/ }
-  - internal, constants = rest.partition{ |k,v| k =~ /^__/ }
+  - if list = obj['ivars']
+    - ivars, rest = list.partition{ |k,v| k =~ /^@\w/ }
+    - cvars, rest = rest.partition{ |k,v| k =~ /^@/ }
+    - internal, constants = rest.partition{ |k,v| k =~ /^__/ }
 
-  - if internal.any?
-    %table.info.internal
+    - if internal.any?
+      %tr.spacer.internal
       - internal.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
           %td.addr= show_addr val
           %td.val= show_val val
 
-  - if ivars.any?
-    %table.info.ivars
+    - if ivars.any?
+      %tr.spacer.ivars
       - ivars.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
           %td.addr= show_addr val
           %td.val= show_val val
 
-  - if cvars.any?
-    %table.info.cvars
+    - if cvars.any?
+      %tr.spacer.cvars
       - cvars.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
           %td.addr= show_addr val
           %td.val= show_val val
 
-  - if constants.any?
-    %table.info.constants
+    - if constants.any?
+      %tr.spacer.constants
       - constants.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
           %td.addr= show_addr val
           %td.val= show_val val
 
-- if list = obj['methods']
-  %table.info.methods
+  - if list = obj['methods']
+    %tr.spacer.methods
     - list.sort_by{|k,v| k}.each do |key,val|
       %tr
         %td.key= key
