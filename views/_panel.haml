@@ -15,7 +15,7 @@
       - if false
         %input{:type => 'text', :name => 'where', :value => where == '{}' ? '' : where, :size => 2}
       - elsif !where.empty?
-        %textarea= where
+        %textarea{:readonly => 'true'}= where
 
     %ul.nav
       %li.objects
