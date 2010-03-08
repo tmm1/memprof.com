@@ -121,7 +121,7 @@ class MemprofApp < Sinatra::Base
     json :count => $dump.db.find(Yajl.load params[:where]).count
   end
 
-  get '/panel' do
+  get %r'/(demo|panel)' do
     subview = params[:subview]
 
     action = case subview
@@ -233,4 +233,6 @@ class MemprofApp < Sinatra::Base
   enable :static
 end
 
-MemprofApp.run!
+if __FILE__ == $0
+  MemprofApp.run!
+end
