@@ -106,6 +106,11 @@ class MemprofApp < Sinatra::Default
   end
 
   helpers do
+    def json obj
+      content_type('application/json')
+      body(Yajl.dump obj)
+      throw :halt
+    end
     def partial name, locals = {}
       haml name, :layout => locals.delete(:layout) || false, :locals => locals
     end
@@ -132,9 +137,9 @@ class MemprofApp < Sinatra::Default
           if name = obj['name']
             "#{name}"
           elsif obj['ivars'] and attached = obj['ivars']['__attached__']
-            "#&lt;MetaClass:#{show_val attached, false}>"
+            "#<MetaClass:#{show_val attached, false}>"
           else
-            "#&lt;#{obj['type'] == 'class' ? 'Class' : 'Module'}:#{obj['_id']}>"
+            "#<#{obj['type'] == 'class' ? 'Class' : 'Module'}:#{obj['_id']}>"
           end
         when 'string'
           if str = obj['data']
@@ -145,25 +150,25 @@ class MemprofApp < Sinatra::Default
           end
         when 'float'
           num = obj['data']
-          "#&lt;Float value=#{num}>"
+          "#<Float value=#{num}>"
         when 'hash', 'array'
-          "#&lt;#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
+          "#<#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
         when 'data', 'object'
-          "#&lt;#{obj['class_name'] || 'Object'}:#{obj['_id']}>"
+          "#<#{obj['class_name'] || 'Object'}:#{obj['_id']}>"
         when 'node'
           "node:#{obj['node_type']}"
         when 'scope'
           vars = obj['variables']
           vars = obj['variables'].keys - ['_','~'] if vars
-          "#&lt;Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
+          "#<Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         when 'file'
-          "#&lt;File:#{obj['_id']}>"
+          "#<File:#{obj['_id']}>"
         else
           obj['_id']
         end
 
         if as_link
-          "<a href='/detailview?where=#{Yajl.dump :_id => obj['_id']}'>#{show}</a>"
+          "<a href='/detailview?where=#{Yajl.dump :_id => obj['_id']}'>#{h show}</a>"
         else
           show
         end
@@ -171,6 +176,9 @@ class MemprofApp < Sinatra::Default
         val
       end
     end
+
+    include Rack::Utils
+    alias_method :h, :escape_html
   end
 
   set :server, 'thin'
