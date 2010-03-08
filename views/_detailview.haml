@@ -6,7 +6,6 @@
     - unless exclude.include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
-        -#%td.addr{:colspan=>2}= show_addr val
         - if %w[ file type line ].include?(key) and val
           %td.val
             - w = {key => val}
@@ -22,7 +21,6 @@
   - if metaclass = $dump.db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
     %tr
       %td.key metaclass
-      -#%td.addr{:colspan=>2}= show_addr metaclass['_id']
       %td.val= show_val metaclass
 
   - if obj['type'] == 'class'
@@ -30,7 +28,6 @@
     - num = ancestors.size
     %tr
       %td.key ancestors
-      -#%td.addr{:colspan=>2} &nbsp;
       %td.val
         - ancestors.each_with_index do |a, i|
           %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => a['_id']}"}= show_val a['_id']
@@ -39,14 +36,12 @@
     - instances = $dump.db.find(:class => obj['_id']).count
     %tr
       %td.key instances
-      -#%td.addr{:colspan=>2} &nbsp;
       %td.val
         %a{:href => "/panel?subview=detail&where=#{Yajl.dump :class => obj['_id']}"}= instances
 
     - subclasses = $dump.db.find(:super => obj['_id']).count
     %tr
       %td.key subclasses
-      -#%td.addr{:colspan=>2} &nbsp;
       %td.val
         %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => obj['_id']}"}= subclasses
 
@@ -55,8 +50,6 @@
     - list.each do |key,val|
       %tr
         %td.key= show_val key
-        -#%td.addr.left= show_addr key
-        -#%td.addr.right= show_addr val
         %td.val= show_val val
 
   - if obj['type'] == 'hash' and list = obj['data'] and list.any?
@@ -64,8 +57,6 @@
     - list.sort_by{|k,v| k}.first(50).each do |key,val|
       %tr
         %td.key= show_val key
-        -#%td.addr.left= show_addr key
-        -#%td.addr.right= show_addr val
         %td.val= show_val val
 
   - if obj['type'] == 'array' and list = obj['data'] and list.any?
@@ -73,7 +64,6 @@
     - list.each_with_index do |val,key|
       %tr
         %td.key= key
-        -#%td.addr{:colspan=>2}= show_addr val
         %td.val= show_val val
 
   - if list = obj['ivars']
@@ -86,7 +76,6 @@
       - internal.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
-          -#%td.addr{:colspan=>2}= show_addr val
           %td.val= show_val val
 
     - if ivars.any?
@@ -94,7 +83,6 @@
       - ivars.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
-          -#%td.addr{:colspan=>2}= show_addr val
           %td.val= show_val val
 
     - if cvars.any?
@@ -102,7 +90,6 @@
       - cvars.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
-          -#%td.addr{:colspan=>2}= show_addr val
           %td.val= show_val val
 
     - if constants.any?
@@ -110,7 +97,6 @@
       - constants.sort_by{|k,v| k}.each do |key,val|
         %tr
           %td.key= key
-          -#%td.addr{:colspan=>2}= show_addr val
           %td.val= show_val val
 
   - if list = obj['methods']
@@ -118,5 +104,4 @@
     - list.sort_by{|k,v| k}.each do |key,val|
       %tr
         %td.key= key
-        -#%td.addr{:colspan=>2}= show_addr val
         %td.val= show_val val
