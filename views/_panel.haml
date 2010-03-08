@@ -44,24 +44,10 @@
             group
             - if subview == 'group'
               by
-              %select
-                %option file
-                %option type
-                %option class_name
-                %option line
-                %option length
-                %option data
-                %option node_type
-
-  - if false and subview == 'group'
-    %ul.grouping
-      %li file
-      %li type
-      %li class_name
-      %li line
-      %li length
-      %li data
-      %li node_type
+              %select.group_key
+                - possible = possible_groupings_for(where.empty? ? {} : Yajl.load(where))
+                - possible.each do |name|
+                  %option{:selected => name == params[:key]}= name
 
   .content
     = content

@@ -91,9 +91,9 @@ class MemprofApp < Sinatra::Base
   get '/groupview' do
     if where = params[:where] and !where.empty?
        where = Yajl.load(where)
-       key = params[:key] || 'type'
+       key = params[:key] || possible_groupings_for(where).first
     else
-      key = 'file'
+      key = (params[:key] ||= 'file')
       where = nil
     end
 
@@ -152,6 +152,29 @@ class MemprofApp < Sinatra::Base
   end
 
   helpers do
+    def possible_groupings_for(w)
+      possible = %w[ type file ]
+
+      case w['type']
+      when 'string', 'hash', 'array'
+        possible << 'line'
+        possible << 'length'
+        possible << 'data' if w['type'] == 'string'
+      when 'module', 'class'
+        possible << 'name'
+      when 'data', 'object'
+        possible << 'class_name'
+      when 'node'
+        possible << 'node_type'
+      end
+
+      possible << 'line' if w.has_key?('file')
+
+      possible -= w.keys
+      possible -= %w[type] if w.has_key?('class_name')
+      possible.uniq!
+      possible
+    end
     def json obj
       content_type('application/json')
       body(Yajl.dump obj)

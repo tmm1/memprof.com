@@ -44,7 +44,7 @@ $.fn.setupPanel = function(){
 
   return $(this).each(function(){
     var panel = $(this);
-    panel.find('ul').not('ul.nav, ul.grouping').setupTree();
+    panel.find('ul').not('ul.nav').setupTree();
     if (numPanels > 1)
       panel.addClass('additional');
   });
@@ -145,7 +145,7 @@ $(function(){
     if (inputVal == input.val()) return;
     inputVal = input.val();
 
-    input.siblings('.objects').html('<img src="/demo/spinner.gif" align="absmiddle" />');
+    input.siblings('.objects').html('<center><img src="/demo/spinner.gif" align="absmiddle" /></center>');
 
     $.getJSON(
       '/subnav',
@@ -167,7 +167,7 @@ $(function(){
   $('ul.nav li a').live('click', function(){
     var panel = $(this).parents('div.panel:first');
     panel.nextAll().remove();
-    panel.find('> div.content').html('<img src="/demo/spinner.gif" style="margin: auto">');
+    panel.find('> div.content').html('<center><img src="/demo/spinner.gif" style="margin: auto"></center>');
 
     $.get(this.href, function(html){
       var newPanel = $(html);
@@ -187,7 +187,7 @@ $(function(){
     curPanel.find('a.current').removeClass('current');
     link.addClass('current');
 
-    var panel = $('<div class="panel additional"><img src="/demo/spinner.gif"></div>');
+    var panel = $('<div class="panel additional"><center><img src="/demo/spinner.gif"></center></div>');
     curPanel.nextAll().remove().end().after(panel);
 
     $.get(this.href, function(html){
@@ -201,5 +201,12 @@ $(function(){
     });
 
     return false;
+  });
+
+  $('div.panel ul.nav li.group select.group_key').live('change', function(){
+    var select = $(this);
+    var link = select.parents('a:first');
+    link.attr('href', link.attr('href').replace(/&key=\w+?/,'') + "&key=" + select.val());
+    link.click();
   });
 });
