@@ -3,6 +3,7 @@
     %li
       - w = (where || {}).merge(key => o[key])
 
+      %span.num= o['count'].to_i
       %span.val
         %a{:href => "/panel?subview=detail&where=#{Yajl.dump w}"}
           - case key
@@ -27,8 +28,6 @@
               = o[key] || '(unknown)'
           - else
             = o[key] || '(unknown)'
-
-      %span.num= o['count'].to_i
 
       - if possible = possible_groupings_for(w) and possible.any?
         - subkey = possible.first
