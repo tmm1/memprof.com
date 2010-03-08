@@ -1,10 +1,10 @@
+- where = params[:root] || params[:where]
+- where ||= ''
+- num = where.empty? ? $dump.db.count : $dump.db.find(Yajl.load where).count
+- key = params[:key] || 'file'
+
 .panel
   %form#search
-    - where = params[:root] || params[:where]
-    - where ||= ''
-    - num = where.empty? ? $dump.db.count : $dump.db.find(Yajl.load where).count
-    - key = params[:key] || 'file'
-
     #query
       - if false
         %select
@@ -40,7 +40,7 @@
 
       - if where.empty? or num > 1
         %li.group
-          %a{:href => "/panel?subview=group&where=#{where}&key=#{params[:key]}", :class => subview == 'group' && 'selected'}
+          %a{:href => "/panel?subview=group&where=#{where}&key=#{key}", :class => subview == 'group' && 'selected'}
             group
             - if subview == 'group'
               by
@@ -48,6 +48,10 @@
                 - possible = possible_groupings_for(where.empty? ? {} : Yajl.load(where))
                 - possible.each do |name|
                   %option{:selected => name == params[:key]}= name
+
+      %li
+        %a.popout{:style => 'float:right', :href => "/panel?subview=#{subview}&where=#{where}&key=#{key}", :target => '_blank'}
+          %img{:border => 0, :align => 'absmiddle', :src => '/link.png'}
 
   .content
     = content

@@ -164,7 +164,7 @@ $(function(){
 
   var form = $('form#search');
 
-  $('ul.nav li a').live('click', function(){
+  $('ul.nav li a:not(.popout)').live('click', function(){
     var panel = $(this).parents('div.panel:first');
     panel.nextAll().remove();
     panel.find('> div.content').html('<center><img src="/demo/spinner.gif" style="margin: auto"></center>');
