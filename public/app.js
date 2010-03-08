@@ -65,14 +65,33 @@ var scrollingTo = false;
 var centerPanel = function(panel, to_top) {
   scrollingTo = true;
 
-  $('div.panel.centered').removeClass('centered');
-  panel.addClass('centered');
+  var wasCentered = false;
+
+  if (panel.hasClass('centered')) {
+    wasCentered = true;
+  } else {
+    $('div.panel.centered').removeClass('centered');
+    panel.addClass('centered');
+  }
 
   var x = panel.position().left + panel.outerWidth()/2 - $(window).width()/2;
   var y = 0;
+  var bottom = panel.position().top + panel.outerHeight();
+  var link = panel.find('a.current');
 
-  if (to_top)
-    $.scrollTo({left:x, top:y}, 'fast');
+  if (!to_top && link.length > 0 && !wasCentered)
+    y = link.position().top - $(window).height()/2;
+
+  if (y < 0) {
+    y = 0;
+    to_top = true;
+  }
+
+  if (window.pageYOffset > bottom && !to_top && y == 0)
+    to_top = true;
+
+  if (to_top || y > 0)
+    $.scrollTo({left:x, top:y}, 'fast', {queue:false});
   else
     $.scrollTo(x, 'fast', {axis:'x'});
 
@@ -89,13 +108,13 @@ $(function(){
     if (e.which == 37) {
       var obj = $('div.panel.centered').prev('div.panel');
       if (obj.length)
-        centerPanel(obj, true);
+        centerPanel(obj);
       return false;
 
     } else if (e.which == 39) {
       var obj = $('div.panel.centered').next('div.panel');
       if (obj.length)
-        centerPanel(obj, true);
+        centerPanel(obj);
       return false;
     }
   });
