@@ -1,7 +1,7 @@
 - where = params[:root] || params[:where]
 - where ||= ''
 - num = where.empty? ? $dump.db.count : $dump.db.find(Yajl.load where).count
-- key = params[:key] || 'file'
+- key = params[:key]
 
 .panel
   %form#search
