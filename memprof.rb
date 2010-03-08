@@ -103,7 +103,7 @@ class MemprofApp < Sinatra::Base
 
   get '/detailview' do
     if where = params[:where]
-      list = $dump.db.find(Yajl.load where)
+      list = $dump.db.find(Yajl.load where).limit(200)
     else
       list = [$dump.root_object]
     end
