@@ -1,22 +1,30 @@
 require 'rubygems'
+require 'bundler'
+Bundler.setup
 
 require 'sinatra/base'
 require 'haml'
-require 'db'
 require 'yajl'
+
+require 'mongo'
+DB = Mongo::Connection.new.db('memprof_site')
 
 require 'memprof.com'
 # $dump = Memprof::Dump.new(:bundler3)
 # $dump = Memprof::Dump.new(:supr)
 $dump = Memprof::Dump.new(:stdlib)
 
-class MemprofApp < Sinatra::Default
+class MemprofApp < Sinatra::Base
   get '/' do
     haml :main
   end
 
   post '/email' do
-    Email.create(:email => params[:email_addr]) if params[:email_addr]
+    DB.collection('emails').insert(
+      :email => params[:email_addr],
+      :time => Time.now,
+      :ip => request.ip
+    )
     haml :thanks
   end
 
