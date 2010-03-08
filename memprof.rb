@@ -82,7 +82,7 @@ class MemprofApp < Sinatra::Base
     end
 
     if list.count == 0
-      haml 'no references found', :layout => (request.xhr? ? false : :ui)
+      haml '<center>no references found</center>', :layout => (request.xhr? ? false : :ui)
     else
       partial :_inbound_refs, :layout => (request.xhr? ? false : :ui), :list => list
     end
@@ -111,7 +111,7 @@ class MemprofApp < Sinatra::Base
     end
 
     if list.count == 0
-      haml 'no matching objects', :layout => (request.xhr? ? false : :ui)
+      haml '<center>no matching objects</center>', :layout => (request.xhr? ? false : :ui)
     elsif list.count == 1
       partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => list.first
     else
