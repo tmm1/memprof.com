@@ -1,0 +1,67 @@
+.panel
+  %form#search
+    - where = params[:root] || params[:where]
+    - where ||= ''
+    - num = where.empty? ? $dump.db.count : $dump.db.find(Yajl.load where).count
+    - key = params[:key] || 'file'
+
+    #query
+      - if false
+        %select
+          %option stdlib
+          %option nokogiri
+          %option rails3
+        %br
+      - if false
+        %input{:type => 'text', :name => 'where', :value => where == '{}' ? '' : where, :size => 2}
+      - elsif !where.empty?
+        %textarea= where
+
+    %ul.nav
+      %li.objects
+        #{num} object#{num == 1 ? '' : 's'}
+
+      - unless where.empty?
+        %li.detail
+          %a{:href => '/panel?subview=detail&where='+where, :class => subview == 'detail' && 'selected'}
+            #{num > 1 && where != '{}' ? 'list' : 'detail'}
+
+      - if where.empty?
+        %li.namespace
+          %a{:href => '/panel?subview=namespace&where='+where, :class => subview == 'namespace' && 'selected'} namespace
+
+      - if where.empty? or (num == 1 and obj = $dump.db.find_one(Yajl.load where) and %w[ class iclass module ].include?(obj['type']))
+        %li.subclasses
+          %a{:href => '/panel?subview=subclasses&where='+where, :class => subview == 'subclasses' && 'selected'} subclasses
+
+      - if num == 1
+        %li.references
+          %a{:href => '/panel?subview=references&where='+where, :class => subview == 'references' && 'selected'} references
+
+      - if where.empty? or num > 1
+        %li.group
+          %a{:href => '/panel?subview=group&where='+where, :class => subview == 'group' && 'selected'}
+            group
+            - if subview == 'group'
+              by
+              %select
+                %option file
+                %option type
+                %option class_name
+                %option line
+                %option length
+                %option data
+                %option node_type
+
+  - if false and subview == 'group'
+    %ul.grouping
+      %li file
+      %li type
+      %li class_name
+      %li line
+      %li length
+      %li data
+      %li node_type
+
+  .content
+    = content

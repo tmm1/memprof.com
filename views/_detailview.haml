@@ -1,16 +1,25 @@
 %table.info
+  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses ]
   - obj.each do |key,val|
-    - unless %w[ code node_code super_name class_name hasSubclasses name ivars methods variables ].include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
+    - next if key == 'line' and val == 0
+    - next if key == 'super' and val == false
+    - unless exclude.include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
         %td.addr= show_addr val
-        - if %w[ file type ].include?(key)
+        - if %w[ file type line ].include?(key) and val
           %td.val
-            %a{:href => "/detailview?where=#{Yajl.dump key => val}"}= val
+            - w = {key => val}
+            - w['file'] = obj['file'] if key == 'line'
+            %a{:href => "/panel?subview=detail&where=#{Yajl.dump w}"}
+              - if key == 'file'
+                = val.split('/').last(4).join('/')
+              - else
+                = val
         - else
           %td.val= show_val val
 
-  - if metaclass = $dump.db.find_one('ivars.__attached__' => obj['_id'])
+  - if metaclass = $dump.db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
     %tr
       %td.key metaclass
       %td.addr= show_addr metaclass['_id']
@@ -24,7 +33,7 @@
       %td.addr &nbsp;
       %td.val
         - ancestors.each_with_index do |a, i|
-          %a{:href => "/detailview?where=#{Yajl.dump :super => a['_id']}"}= show_val a['_id']
+          %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => a['_id']}"}= show_val a['_id']
           %br/
 
     - instances = $dump.db.find(:class => obj['_id']).count
@@ -32,14 +41,14 @@
       %td.key instances
       %td.addr &nbsp;
       %td.val
-        %a{:href => "/detailview?where=#{Yajl.dump :class => obj['_id']}"}= instances
+        %a{:href => "/panel?subview=detail&where=#{Yajl.dump :class => obj['_id']}"}= instances
 
     - subclasses = $dump.db.find(:super => obj['_id']).count
     %tr
       %td.key subclasses
       %td.addr &nbsp;
       %td.val
-        %a{:href => "/detailview?where=#{Yajl.dump :super => obj['_id']}"}= subclasses
+        %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => obj['_id']}"}= subclasses
 
 - if obj['type'] == 'scope' and list = obj['variables'] and list.any?
   %table.info.variables
@@ -52,7 +61,7 @@
 
 - if obj['type'] == 'hash' and list = obj['data'] and list.any?
   %table.info.hash_data
-    - list.sort_by{|k,v| k}.each do |key,val|
+    - list.sort_by{|k,v| k}.first(50).each do |key,val|
       %tr
         %td.key= show_val key
         %td.addr.left= show_addr key

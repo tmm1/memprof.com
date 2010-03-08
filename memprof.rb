@@ -6,7 +6,9 @@ require 'db'
 require 'yajl'
 
 require 'memprof.com'
-$dump = Memprof::Dump.new(:hr)
+# $dump = Memprof::Dump.new(:bundler3)
+# $dump = Memprof::Dump.new(:supr)
+$dump = Memprof::Dump.new(:stdlib)
 
 class MemprofApp < Sinatra::Default
   get '/' do
@@ -23,11 +25,11 @@ class MemprofApp < Sinatra::Default
   end
 
   get '/classview' do
-    if where = params[:where]
-      klass = $dump.db.find_one(Yajl.load where)
+    if of = params[:of] and !of.empty?
+      klass = $dump.db.find_one(Yajl.load of)
       subclasses = $dump.subclasses_of(klass).sort_by{ |o| o['name'] || '' }
-    elsif root = params[:root]
-      subclasses = [$dump.db.find_one(Yajl.load root)]
+    elsif where = params[:where] and !where.empty?
+      subclasses = [$dump.db.find_one(Yajl.load where)]
     else
       subclasses = [$dump.root_object]
     end
@@ -41,7 +43,7 @@ class MemprofApp < Sinatra::Default
   end
 
   get '/namespace' do
-    if where = params[:where]
+    if where = params[:where] and !where.empty?
       obj = $dump.db.find_one(Yajl.load where)
     else
       obj = $dump.root_object
@@ -70,12 +72,17 @@ class MemprofApp < Sinatra::Default
       list = []
     end
 
-    partial :_inbound_refs, :layout => (request.xhr? ? false : :ui), :list => list
+    if list.count == 0
+      haml 'no references found', :layout => (request.xhr? ? false : :ui)
+    else
+      partial :_inbound_refs, :layout => (request.xhr? ? false : :ui), :list => list
+    end
   end
 
   get '/groupview' do
-    if key = params[:key]
-      where = params[:where] ? Yajl.load(params[:where]) : nil
+    if where = params[:where] and !where.empty?
+       where = Yajl.load(where)
+       key = params[:key] || 'type'
     else
       key = 'file'
       where = nil
@@ -101,8 +108,38 @@ class MemprofApp < Sinatra::Default
     end
   end
 
-    # TODO: this needs pagination BIG TIME
-    partial :_listview, :layout => (request.xhr? ? false : :ui), :list => list
+  get '/subnav' do
+    json :count => $dump.db.find(Yajl.load params[:where]).count
+  end
+
+  get '/panel' do
+    subview = params[:subview]
+
+    action = case subview
+    when 'subclasses'
+      'classview'
+    when 'group'
+      'groupview'
+    when 'detail'
+      'detailview'
+    when 'references'
+      'inbound_refs'
+    else
+      subview = 'namespace'
+      'namespace'
+    end
+
+    # TODO: zomg php haxx
+    xhr = request.xhr?
+    def request.xhr?() true end
+    content = send("GET /#{action}")
+
+    partial :_panel, :layout => xhr ? false : :newui, :content => content, :subview => subview
+  end
+
+  get '/app.css' do
+    content_type('text/css')
+    sass :app
   end
 
   helpers do
@@ -116,7 +153,7 @@ class MemprofApp < Sinatra::Default
     end
     def show_addr val
       if val =~ /^0x/
-        "<a href='/detailview?where=#{Yajl.dump :_id => val}'>#{val}</a>"
+        "<a href='/panel?subview=detail&where=#{Yajl.dump :_id => val}'>#{val}</a>"
       else
         '&nbsp;'
       end
@@ -168,7 +205,7 @@ class MemprofApp < Sinatra::Default
         end
 
         if as_link
-          "<a href='/detailview?where=#{Yajl.dump :_id => obj['_id']}'>#{h show}</a>"
+          "<a href='/panel?subview=detail&where=#{Yajl.dump :_id => obj['_id']}'>#{h show}</a>"
         else
           show
         end

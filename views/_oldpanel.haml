@@ -1,0 +1,52 @@
+.panel
+  %form#search
+    - where = params[:root] || params[:where]
+    - where = where.nil? || where.empty? ? '{}' : where
+    - num = $dump.db.find(Yajl.load where).count
+    - key = params[:key] || 'file'
+
+    #query
+      - if false
+        %select
+          %option stdlib
+          %option nokogiri
+          %option rails3
+        %br
+      - if false
+        %input{:type => 'text', :name => 'where', :value => where == '{}' ? '' : where, :size => 2}
+      - elsif where != '{}'
+        %textarea= where == '{}' ? '' : where
+
+    %ul.nav
+      %li.objects
+        #{num} object#{num == 1 ? '' : 's'}
+      - unless where == '{}'
+        %li.detail
+          %a{:href => '/detailview', :class => ('selected' if request.path =~ %r|^/detailview|)}
+            #{num > 1 && where != '{}' ? 'list' : 'detail'}
+      - if where == '{}' or (num == 1 and obj = $dump.db.find_one(Yajl.load where) and %w[ class iclass module ].include?(obj['type']))
+        %li.subclasses
+          %a{:href => '/classview', :class => ('selected' if request.path =~ %r|^/classview|)} subclasses
+      - if where == '{}'
+        %li.namespace
+          %a{:href => '/namespace', :class => ('selected' if request.path =~ %r|^/namespace|)} namespace
+      - if num == 1
+        %li.references
+          %a{:href => '/inbound_refs', :class => ('selected' if request.path =~ %r|^/inbound_refs|)} references
+      - if num > 1
+        %li.group
+          %a{:href => "/groupview?key=#{key}", :class => ('selected' if request.path =~ %r|^/groupview|)} group
+
+  - if request.path =~ %r|^/groupview|
+    %ul.grouping
+      %li file
+      %li type
+      %li class_name
+      %li line
+      %li length
+      %li data
+      %li node_type
+
+  = content
+  
+  %div{:style => 'clear: both'}

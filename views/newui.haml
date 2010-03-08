@@ -1,0 +1,18 @@
+!!!
+%html
+  %head
+    %link{:rel => 'stylesheet', :href => '/demo/screen.css'}/
+    %link{:rel => 'stylesheet', :href => '/demo/jquery.treeview.css'}/
+    %link{:rel => 'stylesheet', :href => '/app.css'}/
+  %body
+    - if request.path =~ %r|^/panel|
+      = yield
+    - else
+      = partial :_oldpanel, :content => yield
+
+    .clear{:style => 'clear: both'}
+    
+    %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'}
+    %script{:type => 'text/javascript', :src => '/demo/jquery.treeview.js'}
+    %script{:type => 'text/javascript', :src => '/demo/jquery.scrollTo-1.4.2.js'}
+    %script{:type => 'text/javascript', :src => '/app.js'}

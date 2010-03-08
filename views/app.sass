@@ -1,0 +1,82 @@
+body
+  padding: 2em
+.panel
+  float: left
+  padding: 0 2em
+  &.additional
+    border-left: 1px solid #ccc
+  .content
+    position: relative
+#query
+  select
+    text-align: right
+    width: 100%
+    margin: auto
+  input, textarea
+    width: 98%
+    border: 1px solid #ccc
+    padding: 5px
+    font-family: monospace
+    color: #666
+    overflow: hidden
+    height: 50px
+    //text-align: center
+.objects
+  color: #666
+  margin-left: 0.35em
+ul.grouping
+  margin: -1em 0 1.5em 0
+  padding: 0
+  li
+    padding: 0.5em
+    display: inline
+    text-align: center
+    cursor: move
+    color: #999
+    list-style-type: none
+ul.nav
+  padding: 0
+  margin: 0.65em 0 1.5em 0
+  li
+    list-style-type: none
+    display: inline
+    padding: 0.5em
+    a.selected
+      color: #c33
+li > span.num
+  color: #bbb
+  width: 50px
+  text-align: right
+  position: absolute
+  left: -8px
+a
+  text-decoration: none
+  color: #33d
+  &:visited
+    color: #33d
+  &:hover
+    text-decoration: none
+  &.current
+    background-color: yellow
+td.addr
+  width: 70px
+  font-family: monospace, courier
+  text-align: center
+  padding-right: 1em
+  a
+    color: #aaa
+    text-decoration: none
+    &:hover
+      color: #aaa
+table.info
+  margin-bottom: 1.25em
+  td.key
+    vertical-align: top
+    text-align: right
+    font-weight: bold
+    padding-right: 1em
+    width: 185px
+  td.val
+    a
+      &:hover
+        font-weight: bold

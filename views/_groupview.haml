@@ -4,7 +4,7 @@
       - w = (where || {}).merge(key => o[key])
 
       %span.val
-        %a{:href => "/detailview?where=#{Yajl.dump w}"}
+        %a{:href => "/panel?subview=detail&where=#{Yajl.dump w}"}
           - case key
           - when 'file'
             - if f = o[key]
