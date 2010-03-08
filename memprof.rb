@@ -4,6 +4,7 @@ Bundler.setup
 
 require 'sinatra/base'
 require 'haml'
+require 'sass'
 require 'yajl'
 
 require 'mongo'
