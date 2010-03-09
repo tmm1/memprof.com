@@ -91,11 +91,9 @@ var centerPanel = function(panel, to_top) {
     to_top = true;
 
   if (to_top || y > 0)
-    $.scrollTo({left:x, top:y}, 'fast', {queue:false});
+    $.scrollTo({left:x, top:y}, 'fast', {queue:false, onAfter:function(){ scrollingTo = false }});
   else
-    $.scrollTo(x, 'fast', {axis:'x'});
-
-  scrollingTo = false;
+    $.scrollTo(x, 'fast', {axis:'x', onAfter:function(){ scrollingTo = false }});
 };
 
 $(function(){
