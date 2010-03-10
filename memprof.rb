@@ -216,6 +216,8 @@ class MemprofApp < Sinatra::Base
           else
             "#<#{obj['type'] == 'class' ? 'Class' : 'Module'}:#{obj['_id']}>"
           end
+        when 'regexp'
+          "/#{obj['data']}/"
         when 'string'
           if str = obj['data']
             str.dump
