@@ -163,7 +163,7 @@ class MemprofApp < Sinatra::Base
 
       case w['type']
       when 'string', 'hash', 'array'
-        possible << 'line'
+        possible << 'line' if w.has_key?('file')
         possible << 'length'
         possible << 'data' if w['type'] == 'string'
       when 'module', 'class'
