@@ -15,7 +15,7 @@ module Memprof
       @db.create_index(:file)
       @db.create_index(:class)
 
-      @refs = @connection.db('memprof').collection("#{collection_name}_refs")
+      @refs = @connection.db('memprof_datasets').collection("#{collection_name}_refs")
       @refs.create_index(:refs)
 
       @root_object = @db.find_one(:type => 'class', :name => 'Object')

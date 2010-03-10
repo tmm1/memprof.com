@@ -14,3 +14,12 @@
     %script{:type => 'text/javascript', :src => '/demo/jquery.treeview.js'}
     %script{:type => 'text/javascript', :src => '/demo/jquery.scrollTo-1.4.2.js'}
     %script{:type => 'text/javascript', :src => '/app.js'}
+
+    :javascript
+      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    :javascript
+      try {
+      var pageTracker = _gat._getTracker("UA-13122595-1");
+      pageTracker._trackPageview();
+      } catch(err) {}

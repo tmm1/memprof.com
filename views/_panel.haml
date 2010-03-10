@@ -43,11 +43,12 @@
           %a{:href => "/panel?subview=group&where=#{where}&key=#{key}", :class => subview == 'group' && 'selected'}
             group
             - if subview == 'group'
-              by
-              %select.group_key
-                - possible = possible_groupings_for(where.empty? ? {} : Yajl.load(where))
-                - possible.each do |name|
-                  %option{:selected => name == params[:key]}= name
+              - possible = possible_groupings_for(where.empty? ? {} : Yajl.load(where))
+              - if possible.any?
+                by
+                %select.group_key
+                  - possible.each do |name|
+                    %option{:selected => name == params[:key]}= name
 
       %li
         %a.popout{:style => 'float:right', :href => "/demo?subview=#{subview}&where=#{where}&key=#{key}", :target => '_blank'}

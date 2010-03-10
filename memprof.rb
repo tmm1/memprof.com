@@ -82,7 +82,7 @@ class MemprofApp < Sinatra::Base
     end
 
     if list.count == 0
-      haml '<center>no references found</center>', :layout => (request.xhr? ? false : :ui)
+      return '<center>no references found</center>'
     else
       partial :_inbound_refs, :layout => (request.xhr? ? false : :ui), :list => list
     end
@@ -99,6 +99,10 @@ class MemprofApp < Sinatra::Base
       where = nil
     end
 
+    if key.nil?
+      return '<center>no possible groupings</center>'
+    end
+
     list = $dump.db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }
     partial :_groupview, :layout => (request.xhr? ? false : :ui), :list => list, :key => key, :where => where
   end
@@ -111,7 +115,7 @@ class MemprofApp < Sinatra::Base
     end
 
     if list.count == 0
-      haml '<center>no matching objects</center>', :layout => (request.xhr? ? false : :ui)
+      return '<center>no matching objects</center>'
     elsif list.count == 1
       partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => list.first
     else
@@ -234,6 +238,8 @@ class MemprofApp < Sinatra::Base
           "#<Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         when 'file'
           "#<File:#{obj['_id']}>"
+        when 'struct'
+          "#<#{obj['class_name'] || 'Struct'}:#{obj['_id']}>"
         else
           obj['_id']
         end
