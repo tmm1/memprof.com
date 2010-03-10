@@ -6,15 +6,7 @@
 .panel
   %form#search
     #query
-      - if false
-        %select
-          %option stdlib
-          %option nokogiri
-          %option rails3
-        %br
-      - if false
-        %input{:type => 'text', :name => 'where', :value => where == '{}' ? '' : where, :size => 2}
-      - elsif !where.empty?
+      - if !where.empty?
         %textarea{:readonly => 'true'}= where
 
     %ul.nav
@@ -23,8 +15,7 @@
 
       - unless where.empty?
         %li.detail
-          %a{:href => '/panel?subview=detail&where='+where, :class => subview == 'detail' && 'selected'}
-            #{num > 1 && where != '{}' ? 'list' : 'detail'}
+          %a{:href => '/panel?subview=detail&where='+where, :class => subview == 'detail' && 'selected'} #{num > 1 && where != '{}' ? 'list' : 'detail'}
 
       - if where.empty?
         %li.namespace

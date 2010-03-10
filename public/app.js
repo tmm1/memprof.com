@@ -156,8 +156,8 @@ $(function(){
   var width = $('div.panel').outerWidth();
   $('body').css('marginLeft', ($(window).width()/2 - width/2) + 'px');
 
+  /*
   var input = $('#query input');
-
   var updateSubnav = function(){
     if (inputVal == input.val()) return;
     inputVal = input.val();
@@ -178,6 +178,7 @@ $(function(){
        .blur( function(){ input.css({padding: '5px', textAlign: 'center'}) });
 
   input.blur();
+  */
 
   var form = $('form#search');
 
