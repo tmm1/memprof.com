@@ -162,10 +162,10 @@ class MemprofApp < Sinatra::Base
       possible = %w[ type file ]
 
       case w['type']
-      when 'string', 'hash', 'array'
+      when 'string', 'hash', 'array', 'regexp'
         possible << 'line' if w.has_key?('file')
         possible << 'length'
-        possible << 'data' if w['type'] == 'string'
+        possible << 'data' if %w[ string regexp ].include?(w['type'])
       when 'module', 'class'
         possible << 'name'
       when 'data', 'object'
