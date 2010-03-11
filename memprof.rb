@@ -11,9 +11,7 @@ require 'mongo'
 DB = Mongo::Connection.new.db('memprof_site')
 
 require 'memprof.com'
-# $dump = Memprof::Dump.new(:bundler3)
-# $dump = Memprof::Dump.new(:supr)
-$dump = Memprof::Dump.new(:stdlib)
+$dump = Memprof::Dump.new(ARGV[0] || :stdlib)
 
 class MemprofApp < Sinatra::Base
   get '/' do
@@ -76,7 +74,7 @@ class MemprofApp < Sinatra::Base
     if root = params[:root]
       list = [$dump.db.find_one(Yajl.load root)]
     elsif where = params[:where]
-      list = $dump.refs.find(Yajl.load where)
+      list = $dump.refs.find(Yajl.load where).limit(25)
     else
       list = []
     end
