@@ -96,6 +96,26 @@ var centerPanel = function(panel, to_top) {
     $.scrollTo(x, 'fast', {axis:'x', onAfter:function(){ scrollingTo = false }});
 };
 
+var findClosestPanel = function(){
+  var left = window.pageXOffset;
+  var closest = false;
+  var showPanel = null;
+
+  $('div.panel').each(function(){
+    var panel = $(this);
+    var pos = panel.position().left + panel.outerWidth()/2 - $(window).width()/2;
+    var diff = Math.abs(pos - left);
+
+    if (closest === false || diff < closest) {
+      closest = diff;
+      showPanel = panel;
+    } else
+      return false;
+  });
+
+  return showPanel;
+};
+
 $(function(){
   $(window).keydown(function(e){
     if (e.which == 37 || e.which == 39)
@@ -104,19 +124,32 @@ $(function(){
 
   $(window).keyup(function(e){
     if (e.which == 37) {
-      var obj = $('div.panel.centered').prev('div.panel');
+      var panel = findClosestPanel();
+      if (!panel)
+        return false;
+
+      var obj = panel.prev('div.panel');
       if (obj.length)
         centerPanel(obj);
+      else
+        centerPanel(panel);
       return false;
 
     } else if (e.which == 39) {
-      var obj = $('div.panel.centered').next('div.panel');
+      var panel = findClosestPanel();
+      if (!panel)
+        return false;
+
+      var obj = panel.next('div.panel');
       if (obj.length)
         centerPanel(obj);
+      else
+        centerPanel(panel);
       return false;
     }
   });
 
+  /*
   var scrollTimeout = null;
   $(window).scroll(function(){
     if (scrollingTo)
@@ -132,25 +165,12 @@ $(function(){
       if (scrollingTo)
         return;
 
-      var left = window.pageXOffset;
-      var closest = false;
-      var showPanel = null;
-
-      $('div.panel').each(function(){
-        var panel = $(this);
-        var pos = panel.position().left + panel.outerWidth()/2 - $(window).width()/2;
-        var diff = Math.abs(pos - left);
-
-        if (closest === false || diff < closest) {
-          closest = diff;
-          showPanel = panel;
-        } else
-          return false;
-      });
-
-      centerPanel(showPanel);
+      var showPanel = findClosestPanel();
+      if (showPanel)
+        centerPanel(showPanel);
     }, 200);
   });
+  */
 
   $('div.panel').setupPanel();
   var width = $('div.panel').outerWidth();
