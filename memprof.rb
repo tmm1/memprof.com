@@ -14,7 +14,7 @@ require 'memprof.com'
 $dump = Memprof::Dump.new(:stdlib)
 
 class MemprofApp < Sinatra::Base
-  get '/' do
+  get '/signup' do
     haml :main
   end
 
@@ -125,7 +125,7 @@ class MemprofApp < Sinatra::Base
     json :count => $dump.db.find(Yajl.load params[:where]).count
   end
 
-  get %r'/(demo|panel)' do
+  get %r'/(demo|panel)?$' do
     subview = params[:subview]
 
     action = case subview
