@@ -11,7 +11,7 @@ require 'mongo'
 DB = Mongo::Connection.new.db('memprof_site')
 
 require 'memprof.com'
-$dump = Memprof::Dump.new(ARGV[0] || :stdlib)
+$dump = Memprof::Dump.new(:stdlib)
 
 class MemprofApp < Sinatra::Base
   get '/' do
