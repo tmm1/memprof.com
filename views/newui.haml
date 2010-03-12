@@ -7,6 +7,13 @@
     %link{:rel => 'stylesheet', :href => '/demo/jquery.treeview.css'}/
     %link{:rel => 'stylesheet', :href => '/app.css'}/
   %body
+    #contact_us
+      %a{:href => '/'} signup
+      = "|"
+      %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
+      = "|"
+      %a{:href => 'mailto:gc@memprof.com'} contact us
+
     = yield
     .clear{:style => 'clear: both'}
     
