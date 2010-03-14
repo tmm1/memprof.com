@@ -1,5 +1,5 @@
 %table.info
-  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses ]
+  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses n1 n2 n3 ]
   - obj.each do |key,val|
     - next if key == 'line' and val == 0
     - next if key == 'super' and val == false
@@ -17,6 +17,14 @@
                 = val
         - else
           %td.val= show_val val
+
+  - if obj['type'] == 'node'
+    %tr.spacer.node_links
+    - %w[ n1 n2 n3 ].each do |key|
+      - if obj.has_key?(key)
+        %tr
+          %td.key= key
+          %td.val= show_val obj[key]
 
   - if metaclass = @db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
     %tr

@@ -219,6 +219,8 @@ class MemprofApp < Sinatra::Base
           obj = @db.find_one(:_id => val)
         end
 
+        return val unless obj
+
         show = case obj['type']
         when 'class', 'module', 'iclass'
           if name = obj['name']
