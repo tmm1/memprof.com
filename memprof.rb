@@ -149,6 +149,7 @@ class MemprofApp < Sinatra::Base
     when 'detail'
       'detailview'
     when 'references'
+      params[:root] = params[:where]
       'inbound_refs'
     else
       subview = 'namespace'
