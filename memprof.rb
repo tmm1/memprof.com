@@ -248,7 +248,7 @@ class MemprofApp < Sinatra::Base
         when 'varmap'
           vars = obj['data']
           vars = obj['data'].keys if vars
-          "#<Varmap:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
+          "#<Varmap:#{obj['_id']}#{vars ? " var=#{vars.join(', ')}" : nil}>"
         when 'scope'
           vars = obj['variables']
           vars = obj['variables'].keys - ['_','~'] if vars
