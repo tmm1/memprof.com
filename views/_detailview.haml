@@ -6,7 +6,7 @@
     - unless exclude.include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
       %tr
         %td.key= key == '_id' ? 'address' : key
-        - if %w[ file type line ].include?(key) and val
+        - if %w[ file type line node_type ].include?(key) and val
           %td.val
             - w = {key => val}
             - w['file'] = obj['file'] if key == 'line'
