@@ -59,6 +59,16 @@
         %td.key= show_val key
         %td.val= show_val val
 
+  - if obj['type'] == 'varmap' and obj['next']
+    %tr.spacer.varmap_data
+    - o = obj
+    - while o['next'] and o = @db.find_one(:_id => o['next'])
+      - if o['data']
+        - key, val = o['data'].to_a.first
+        %tr
+          %td.key <a href='/panel?subview=detail&where=#{Yajl.dump :_id => o['_id']}'>#{key}</a>
+          %td.val= show_val val
+
   - if obj['type'] == 'array' and list = obj['data'] and list.any?
     %tr.spacer.array_data
     - list.each_with_index do |val,key|
