@@ -32,7 +32,8 @@ $.fn.setupTree = function() {
           },
           error: function() {
             $this.removeClass('loaded');
-          }
+          },
+          cache: false
         });
       }
     });
