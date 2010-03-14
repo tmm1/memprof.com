@@ -7,15 +7,15 @@ require 'pp'
 module Memprof
   class Dump
     def initialize(collection_name)
-      @connection = Mongo::Connection.new
+      @@connection ||= Mongo::Connection.new
 
-      @db = @connection.db('memprof_datasets').collection(collection_name.to_s)
+      @db = @@connection.db('memprof_datasets').collection(collection_name.to_s)
       @db.create_index(:type)
       @db.create_index(:super)
       @db.create_index(:file)
       @db.create_index(:class)
 
-      @refs = @connection.db('memprof_datasets').collection("#{collection_name}_refs")
+      @refs = @@connection.db('memprof_datasets').collection("#{collection_name}_refs")
       @refs.create_index(:refs)
 
       @root_object = @db.find_one(:type => 'class', :name => 'Object')
