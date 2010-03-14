@@ -18,13 +18,13 @@
         - else
           %td.val= show_val val
 
-  - if metaclass = $dump.db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
+  - if metaclass = @db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
     %tr
       %td.key metaclass
       %td.val= show_val metaclass
 
   - if obj['type'] == 'class'
-    - ancestors = $dump.ancestors_of(obj) and ancestors.any?
+    - ancestors = @dump.ancestors_of(obj) and ancestors.any?
     - num = ancestors.size
     %tr
       %td.key ancestors
@@ -33,13 +33,13 @@
           %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => a['_id']}"}= show_val a['_id']
           %br/
 
-    - instances = $dump.db.find(:class => obj['_id']).count
+    - instances = @db.find(:class => obj['_id']).count
     %tr
       %td.key instances
       %td.val
         %a{:href => "/panel?subview=detail&where=#{Yajl.dump :class => obj['_id']}"}= instances
 
-    - subclasses = $dump.db.find(:super => obj['_id']).count
+    - subclasses = @db.find(:super => obj['_id']).count
     %tr
       %td.key subclasses
       %td.val

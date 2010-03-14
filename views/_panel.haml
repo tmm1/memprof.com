@@ -1,6 +1,6 @@
 - where = params[:root] || params[:where]
 - where ||= ''
-- num = where.empty? ? $dump.db.count : $dump.db.find(Yajl.load where).count
+- num = where.empty? ? @db.count : @db.find(Yajl.load where).count
 - key = params[:key]
 
 .panel
@@ -21,7 +21,7 @@
         %li.namespace
           %a{:href => '/panel?subview=namespace&where='+where, :class => subview == 'namespace' && 'selected'} namespace
 
-      - if where.empty? or (num == 1 and obj = $dump.db.find_one(Yajl.load where) and %w[ class iclass module ].include?(obj['type']))
+      - if where.empty? or (num == 1 and obj = @db.find_one(Yajl.load where) and %w[ class iclass module ].include?(obj['type']))
         %li.subclasses
           %a{:href => '/panel?subview=subclasses&where='+where, :class => subview == 'subclasses' && 'selected'} subclasses
 

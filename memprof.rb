@@ -11,11 +11,24 @@ require 'mongo'
 DB = Mongo::Connection.new.db('memprof_site')
 
 require 'memprof.com'
-$dump = Memprof::Dump.new(:stdlib)
 
 class MemprofApp < Sinatra::Base
+  before do
+    @dump = Memprof::Dump.new(session[:db] || :stdlib)
+    @db = @dump.db
+  end
+
   get '/signup' do
     haml :main
+  end
+
+  get '/db' do
+    session[:db] || 'stdlib'
+  end
+
+  get '/db/:db' do
+    session[:db] = params[:db]
+    redirect '/db'
   end
 
   post '/email' do
@@ -33,17 +46,17 @@ class MemprofApp < Sinatra::Base
 
   get '/classview' do
     if of = params[:of] and !of.empty?
-      klass = $dump.db.find_one(Yajl.load of)
-      subclasses = $dump.subclasses_of(klass).sort_by{ |o| o['name'] || '' }
+      klass = @db.find_one(Yajl.load of)
+      subclasses = @dump.subclasses_of(klass).sort_by{ |o| o['name'] || '' }
     elsif where = params[:where] and !where.empty?
-      subclasses = [$dump.db.find_one(Yajl.load where)]
+      subclasses = [@db.find_one(Yajl.load where)]
     else
-      subclasses = [$dump.root_object]
+      subclasses = [@dump.root_object]
     end
 
     subclasses.compact!
     subclasses.each do |o|
-      o['hasSubclasses'] = $dump.subclasses_of?(o)
+      o['hasSubclasses'] = @dump.subclasses_of?(o)
     end
 
     partial :_classview, :layout => (request.xhr? ? false : :ui), :list => subclasses
@@ -51,19 +64,19 @@ class MemprofApp < Sinatra::Base
 
   get '/namespace' do
     if where = params[:where] and !where.empty?
-      obj = $dump.db.find_one(Yajl.load where)
+      obj = @db.find_one(Yajl.load where)
     else
-      obj = $dump.root_object
+      obj = @dump.root_object
     end
 
     constants = obj['ivars'].reject{ |k,v| k !~ /^[A-Z]/ }
     names = constants.invert
-    classes = $dump.db.find(:type => {:$in => %w[iclass class module]}, :_id => {:$in => constants.values}).to_a.sort_by{ |o| names[o['_id']] || o['name'] }
+    classes = @db.find(:type => {:$in => %w[iclass class module]}, :_id => {:$in => constants.values}).to_a.sort_by{ |o| names[o['_id']] || o['name'] }
 
     classes.each do |o|
       unless o['name'] == 'Object'
         vars = o['ivars'].reject{ |k,v| k !~ /^[A-Z]/ }
-        o['hasChildren'] = !!$dump.db.find_one(:type => {:$in => %w[iclass class module]}, :_id => {:$in => vars.values})
+        o['hasChildren'] = !!@db.find_one(:type => {:$in => %w[iclass class module]}, :_id => {:$in => vars.values})
       end
     end
 
@@ -72,9 +85,9 @@ class MemprofApp < Sinatra::Base
 
   get '/inbound_refs' do
     if root = params[:root]
-      list = [$dump.db.find_one(Yajl.load root)]
+      list = [@db.find_one(Yajl.load root)]
     elsif where = params[:where]
-      list = $dump.refs.find(Yajl.load where).limit(25)
+      list = @dump.refs.find(Yajl.load where).limit(25)
     else
       list = []
     end
@@ -101,15 +114,15 @@ class MemprofApp < Sinatra::Base
       return '<center>no possible groupings</center>'
     end
 
-    list = $dump.db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }
+    list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }
     partial :_groupview, :layout => (request.xhr? ? false : :ui), :list => list, :key => key, :where => where
   end
 
   get '/detailview' do
     if where = params[:where]
-      list = $dump.db.find(Yajl.load where).limit(200)
+      list = @db.find(Yajl.load where).limit(200)
     else
-      list = [$dump.root_object]
+      list = [@dump.root_object]
     end
 
     if list.count == 0
@@ -122,7 +135,7 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/subnav' do
-    json :count => $dump.db.find(Yajl.load params[:where]).count
+    json :count => @db.find(Yajl.load params[:where]).count
   end
 
   get %r'/(demo|panel)?$' do
@@ -202,7 +215,7 @@ class MemprofApp < Sinatra::Base
         if val.is_a?(OrderedHash)
           obj = val
         else
-          obj = $dump.db.find_one(:_id => val)
+          obj = @db.find_one(:_id => val)
         end
 
         show = case obj['type']
@@ -220,7 +233,7 @@ class MemprofApp < Sinatra::Base
           if str = obj['data']
             str.dump
           elsif parent = obj['shared']
-            o = $dump.db.find_one(:_id => parent)
+            o = @db.find_one(:_id => parent)
             o['data'].dump
           end
         when 'float'
@@ -262,6 +275,7 @@ class MemprofApp < Sinatra::Base
   set :port, 7006
   set :public, File.expand_path('../public', __FILE__)
   enable :static
+  enable :sessions
 end
 
 if __FILE__ == $0
