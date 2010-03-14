@@ -173,7 +173,7 @@ class MemprofApp < Sinatra::Base
       possible = %w[ type file ]
 
       case w['type']
-      when 'string', 'hash', 'array', 'regexp'
+      when 'string', 'hash', 'array', 'regexp', 'bignum'
         possible << 'line' if w.has_key?('file')
         possible << 'length'
         possible << 'data' if %w[ string regexp ].include?(w['type'])
@@ -236,6 +236,8 @@ class MemprofApp < Sinatra::Base
             o = @db.find_one(:_id => parent)
             o['data'].dump
           end
+        when 'bignum'
+          "#<Bignum length=#{obj['length']}>"
         when 'float'
           num = obj['data']
           "#<Float value=#{num}>"
