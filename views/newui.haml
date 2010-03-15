@@ -16,9 +16,9 @@
             %option{:selected => name == (session[:db] || 'stdlib')}= name
       - else
         %a{:href => '/signup'} sign up
-      = "|"
+      %span.sep= "|"
       %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
-      = "|"
+      %span.sep= "|"
       %a{:href => 'mailto:gc@memprof.com'} contact us
 
     = yield
