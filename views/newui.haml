@@ -7,7 +7,9 @@
     %link{:rel => 'stylesheet', :href => '/demo/jquery.treeview.css'}/
     %link{:rel => 'stylesheet', :href => '/app.css'}/
   %body
-    #contact_us
+    #menubar
+      %b memprof.com
+      %span.sep= "|"
       - if session.has_key?(:db) || session.has_key?(:beta)
         %select.collection
           - CONN.db('memprof_datasets').collections.each do |c|
@@ -16,10 +18,10 @@
             %option{:selected => name == (session[:db] || 'stdlib')}= name
       - else
         %a{:href => '/signup'} sign up
-      %span.sep= "|"
-      %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
-      %span.sep= "|"
-      %a{:href => 'mailto:gc@memprof.com'} contact us
+        %span.sep= "|"
+        %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
+        %span.sep= "|"
+        %a{:href => 'mailto:gc@memprof.com'} contact us
 
     = yield
     .clear{:style => 'clear: both'}

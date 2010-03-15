@@ -253,7 +253,7 @@ $(function(){
     link.click();
   });
 
-  $('div#contact_us select.collection').live('change', function(){
+  $('div#menubar select.collection').live('change', function(){
     var select = $(this);
     window.location = '/db/' + select.val();
   });

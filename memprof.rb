@@ -28,6 +28,12 @@ class MemprofApp < Sinatra::Base
     redirect '/'
   end
 
+  get '/logout' do
+    session.delete(:beta)
+    session.delete(:db)
+    redirect '/'
+  end
+
   get '/db' do
     session[:db] || 'stdlib'
   end
