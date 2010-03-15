@@ -252,4 +252,9 @@ $(function(){
     link.attr('href', link.attr('href').replace(/&key=.*$/,'') + "&key=" + select.val());
     link.click();
   });
+
+  $('div#contact_us select.collection').live('change', function(){
+    var select = $(this);
+    window.location = '/db/' + select.val();
+  });
 });

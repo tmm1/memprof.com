@@ -8,7 +8,14 @@
     %link{:rel => 'stylesheet', :href => '/app.css'}/
   %body
     #contact_us
-      %a{:href => '/signup'} sign up
+      - if session.has_key?(:db) || session.has_key?(:beta)
+        %select.collection
+          - CONN.db('memprof_datasets').collections.each do |c|
+            - next unless c.name =~ /_refs$/
+            - name = c.name.gsub(/_refs$/,'')
+            %option{:selected => name == (session[:db] || 'stdlib')}= name
+      - else
+        %a{:href => '/signup'} sign up
       = "|"
       %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
       = "|"

@@ -8,7 +8,8 @@ require 'sass'
 require 'yajl'
 
 require 'mongo'
-DB = Mongo::Connection.new.db('memprof_site')
+CONN = Mongo::Connection.new
+DB = CONN.db('memprof_site')
 
 require 'memprof.com'
 
@@ -22,13 +23,18 @@ class MemprofApp < Sinatra::Base
     haml :main
   end
 
+  get '/beta' do
+    session[:beta] = true
+    redirect '/'
+  end
+
   get '/db' do
     session[:db] || 'stdlib'
   end
 
   get '/db/:db' do
     session[:db] = params[:db]
-    redirect '/db'
+    redirect '/'
   end
 
   post '/email' do
@@ -280,7 +286,7 @@ class MemprofApp < Sinatra::Base
   set :port, 7006
   set :public, File.expand_path('../public', __FILE__)
   enable :static
-  enable :sessions
+  use Rack::Session::Cookie, :key => 'memprof_session', :secret => 'noisses_forpmem'
 end
 
 if __FILE__ == $0
