@@ -40,10 +40,6 @@ class MemprofApp < Sinatra::Base
     haml :thanks
   end
 
-  get '/test' do
-    partial :_testview, :layout => (request.xhr? ? false : :ui)
-  end
-
   get '/classview' do
     if of = params[:of] and !of.empty?
       klass = @db.find_one(Yajl.load of)
