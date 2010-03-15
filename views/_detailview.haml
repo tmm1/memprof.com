@@ -24,7 +24,11 @@
       - if obj.has_key?(key)
         %tr
           %td.key= key
-          %td.val= show_val obj[key]
+          - if obj[key].is_a?(Array)
+            %td.val
+              == [ #{obj[key].join(', ')} ]
+          - else
+            %td.val= show_val obj[key]
 
   - if metaclass = @db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
     %tr
