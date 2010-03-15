@@ -5,7 +5,6 @@ General
   - Debug output
 
 Linux
-  - tramp calls in C extensions in --enable-shared
   - i386 "bug" with missing tramp to rb_newobj
 
 OSX
@@ -38,18 +37,11 @@ Ruby 1.9 Variables
   - &rb_objspace
 
 Tracking
-  - add support for libjudy
   - time of object creation
   - stack trace at object creation
-  - get rid of strdups for filenames
   - dump out struct SCOPE and BLOCK structures as json
   - sampling
   - track only certain types (dependent on OBJSETUP tramping)
-
-Visualizations
-  - count by filename
-  - breakdown further by line/type/classname/hashsize/stringcontents
-  - stack visualizations for all threads and blocks
 
 Other Plugins
   - tcmalloc equivalent of malloc_get_usable_size
