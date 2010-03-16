@@ -257,7 +257,10 @@ class MemprofApp < Sinatra::Base
         when 'hash', 'array'
           "#<#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
         when 'data', 'object'
-          "#<#{obj['class_name'] || 'Object'}:#{obj['_id']}>"
+          if node = obj['nd_body'] and node = @db.find_one(:_id => node) and node['file']
+            suffix = "@#{node['file'].split('/').last(4).join('/')}:#{node['line']}"
+          end
+          "#<#{obj['class_name'] || 'Object'}:#{obj['_id']}#{suffix}>"
         when 'node'
           nd_type = obj['node_type']
           if nd_type == 'CFUNC' and obj['n1'] =~ /: (\w+)/
