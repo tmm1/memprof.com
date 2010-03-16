@@ -10,7 +10,7 @@ file = ARGV[0]
 basename = File.basename(file, '.json')
 refs_file = ARGV[0].sub('.json', '_refs.json')
 
-unless File.exists?(refs_file)
+if true # !File.exists?(refs_file)
   out = File.open(refs_file, 'w')
 
   parser = Yajl::Parser.new :check_utf8 => false
