@@ -30,7 +30,7 @@
           - else
             %td.val= show_val obj[key]
 
-    - if %w[ DEFN ].include?(obj['node_type']) or (obj['node_type'] == 'METHOD' and obj['n2'] and node = @db.find_one(:_id => obj['n2']) and node['node_type'] == 'SCOPE')
+    - if obj.has_key?('n2') and %w[ DEFN ].include?(obj['node_type']) or (obj['node_type'] == 'METHOD' and obj['n2'] and node = @db.find_one(:_id => obj['n2']) and node['node_type'] == 'SCOPE')
       %tr.spacer.code
       %tr
         %td.code{:colspan=>2}
