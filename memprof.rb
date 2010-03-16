@@ -249,6 +249,8 @@ class MemprofApp < Sinatra::Base
           end
         when 'bignum'
           "#<Bignum length=#{obj['length']}>"
+        when 'match'
+          "#<Match:#{obj['_id']}>"
         when 'float'
           num = obj['data']
           "#<Float value=#{num}>"
@@ -257,7 +259,11 @@ class MemprofApp < Sinatra::Base
         when 'data', 'object'
           "#<#{obj['class_name'] || 'Object'}:#{obj['_id']}>"
         when 'node'
-          "node:#{obj['node_type']}"
+          nd_type = obj['node_type']
+          if nd_type == 'CFUNC' and obj['n1'] =~ /: (\w+)/
+            suffix = " (#{$1})"
+          end
+          "node:#{nd_type}#{suffix}"
         when 'varmap'
           vars = obj['data']
           vars = obj['data'].keys if vars
