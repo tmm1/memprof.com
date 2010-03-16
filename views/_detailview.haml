@@ -30,6 +30,16 @@
           - else
             %td.val= show_val obj[key]
 
+    - if %w[ DEFN ].include?(obj['node_type']) or (obj['node_type'] == 'METHOD' and obj['n2'] and node = @db.find_one(:_id => obj['n2']) and node['node_type'] == 'SCOPE')
+      %tr.spacer.code
+      %tr
+        %td.code{:colspan=>2}
+          - sexp = Sexp.from_array(@dump.gen_sexp(obj['_id']))
+          - begin
+            %pre.prettyprint=h Ruby2Ruby.new.process(sexp)
+          - rescue
+            - Kernel.p $!
+
   - if metaclass = @db.find_one('ivars.__attached__' => obj['_id']) and metaclass['_id'] != obj['class']
     %tr
       %td.key metaclass
