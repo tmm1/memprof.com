@@ -16,7 +16,13 @@
               - else
                 = val
         - else
-          %td.val= show_val val
+          %td.val
+            - if val.is_a?(Array)
+              - val.each do |v|
+                = show_val v
+                %br/
+            - else
+              = show_val val
 
   - if obj['type'] == 'node'
     %tr.spacer.node_links
