@@ -48,6 +48,18 @@ $.fn.setupPanel = function(){
     panel.find('ul').not('ul.nav').setupTree();
     if (numPanels > 1)
       panel.addClass('additional');
+
+    panel.find('pre.prettyprint').prettify();
+  });
+};
+
+$.fn.prettify = function(){
+  return $(this).each(function(){
+    var container = $(this);
+    if (container.hasClass('prettified'))
+      return;
+    container.addClass('prettified');
+    container.html(prettyPrintOne(container.html()));
   });
 };
 
@@ -257,4 +269,6 @@ $(function(){
     var select = $(this);
     window.location = '/db/' + select.val();
   });
+
+  $('pre.prettyprint').prettify();
 });
