@@ -1,5 +1,5 @@
 %table.info
-  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses n1 n2 n3 ]
+  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses n1 n2 n3 nd_body nd_var nd_cref ]
   - obj.each do |key,val|
     - next if key == 'line' and val == 0
     - next if key == 'super' and val == false
@@ -23,6 +23,14 @@
                 %br/
             - else
               = show_val val
+
+  - if obj.has_key?('nd_var')
+    %tr.spacer.proc_links
+    - %w[ nd_body nd_var nd_cref ].each do |key|
+      - next unless obj.has_key?(key)
+      %tr
+        %td.key= key
+        %td.val= show_val obj[key]
 
   - if obj['type'] == 'node'
     %tr.spacer.node_links
