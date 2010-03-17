@@ -36,11 +36,15 @@
           - else
             %td.val= show_val obj[key]
 
-    - if obj.has_key?('n2') and %w[ DEFN ].include?(obj['node_type']) or (obj['node_type'] == 'METHOD' and obj['n2'] and node = @db.find_one(:_id => obj['n2']) and node['node_type'] == 'SCOPE')
+    - defn = obj['_id'] if obj['node_type'] == 'DEFN'
+    - if obj['node_type'] == 'METHOD' and obj['n2'] and scope = @db.find_one(:_id => obj['n2'], :node_type => 'SCOPE')
+      - defn ||= obj['_id']
+
+    - if defn
       %tr.spacer.code
       %tr
         %td.code{:colspan=>2}
-          - sexp = Sexp.from_array(@dump.gen_sexp(obj['_id']))
+          - sexp = Sexp.from_array(@dump.gen_sexp(defn))
           - begin
             %pre.prettyprint=h Ruby2Ruby.new.process(sexp)
           - rescue
