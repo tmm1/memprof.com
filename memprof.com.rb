@@ -4,6 +4,12 @@ require 'pp'
 require 'ruby_parser'
 require 'ruby2ruby'
 
+class OrderedHash
+  def nd_clss
+    self['n1']
+  end
+end
+
 module Memprof
   class Dump
     def initialize(collection_name)

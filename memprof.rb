@@ -266,6 +266,9 @@ class MemprofApp < Sinatra::Base
           if nd_type == 'CFUNC' and obj['n1'] =~ /: (\w+)/
             name = $1
             suffix = " (#{name})" unless name =~ /dylib_header/
+          elsif nd_type == 'CREF'
+            name = show_val(obj.nd_clss, false)
+            suffix = " (#{name})" if name
           end
           "node:#{nd_type}#{suffix}"
         when 'varmap'
