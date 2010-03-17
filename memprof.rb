@@ -258,7 +258,7 @@ class MemprofApp < Sinatra::Base
           "#<#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
         when 'data', 'object'
           if node = obj['nd_body'] and node = @db.find_one(:_id => node) and node['file']
-            suffix = "@#{node['file'].split('/').last(4).join('/')}:#{node['line']}"
+            suffix = " #{node['file'].split('/').last(4).join('/')}:#{node['line']}"
           end
           "#<#{obj['class_name'] || 'Object'}:#{obj['_id']}#{suffix}>"
         when 'node'
