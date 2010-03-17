@@ -278,6 +278,7 @@ class MemprofApp < Sinatra::Base
         when 'scope'
           vars = obj['variables']
           vars = obj['variables'].keys - ['_','~'] if vars
+          vars = nil unless vars and vars.any?
           "#<Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         when 'file'
           "#<File:#{obj['_id']}>"
