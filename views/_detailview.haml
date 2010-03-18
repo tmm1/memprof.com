@@ -85,7 +85,7 @@
       %td.val
         %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => obj['_id']}"}= subclasses
 
-  - if %w[ scope globals ].include?(obj['type']) and list = obj['variables'] and list.any?
+  - if %w[ scope globals data ].include?(obj['type']) and list = obj['variables'] and list.any?
     %tr.spacer.variables
     - list.each do |key,val|
       %tr
