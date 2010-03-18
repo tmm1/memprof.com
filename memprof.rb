@@ -280,6 +280,13 @@ class MemprofApp < Sinatra::Base
           vars = obj['variables'].keys - ['_','~'] if vars
           vars = nil unless vars and vars.any?
           "#<Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
+        when 'frame'
+          klass = show_val(obj['last_class'], false) if obj['last_class']
+          func = obj['last_func'] || obj['orig_func']
+          func = func ? func[1..-1] : '(unknown)'
+
+          suffix = " #{klass ? klass + "#" : nil}#{func}" if klass or func
+          "Frame:#{obj['_id']}#{suffix}"
         when 'file'
           "#<File:#{obj['_id']}>"
         when 'struct'
