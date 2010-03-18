@@ -44,10 +44,7 @@
           - else
             %td.val= show_val obj[key]
 
-    - defn = obj['_id'] if obj['node_type'] == 'DEFN'
-    - if obj['node_type'] == 'METHOD' and obj['n2'] and scope = @db.find_one(:_id => obj['n2'], :node_type => 'SCOPE')
-      - defn ||= obj['_id']
-
+    - defn = obj['_id'] if obj.has_key?('n2') and %w[ DEFN METHOD CALL FCALL ARRAY LIT ATTRASGN CONST BLOCK NEWLINE ITER IVAR ].include?(obj['node_type'])
     - if defn
       %tr.spacer.code
       %tr

@@ -42,7 +42,9 @@ module Memprof
       case obj['node_type']
       when 'METHOD'
         tree = gen_sexp(obj['n2'])
-        tree = tree.last.last
+        if tree.last.is_a?(Array) and tree.last.first == :scope
+          tree = tree.last.last
+        end
 
       when 'CFUNC'
         tree << :cfunc
@@ -209,8 +211,8 @@ module Memprof
       when 'ZARRAY'
         tree << :array
 
-      when 'DEFINED'
-        tree << :defined
+      when 'DEFINED', 'FBODY'
+        tree << obj['node_type'].downcase.to_sym
         tree << gen_sexp(obj['n1'])
 
       when 'BLOCK_PASS'
@@ -379,6 +381,15 @@ module Memprof
         tree << :match2
         tree << gen_sexp(obj['n1'])
         tree << gen_sexp(obj['n2'])
+
+      when 'DREGX'
+        tree << :dregx
+        tree << @db.find_one(:_id => obj['n1'])['data']
+        tree << gen_sexp(obj['n3'])
+
+      when 'BACK_REF'
+        tree << :back_ref
+        tree << obj['n2'][1..-1].to_sym
 
       else
         p [:UNKNOWN, obj['node_type']]
