@@ -20,6 +20,7 @@ module Memprof
       @db.create_index(:super)
       @db.create_index(:file)
       @db.create_index(:class)
+      @db.create_index('ivars.__attached__')
 
       @refs = @@connection.db('memprof_datasets').collection("#{collection_name}_refs")
       @refs.create_index(:refs)
