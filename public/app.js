@@ -99,7 +99,9 @@ var updateHash = function(){
   window.location.hash = '';
   $('div.panel').each(function(){
     window.location.hash += ($(this).attr('url') || '');
-    window.location.hash += ('//' + $(this).find('a.current').text().trim());
+    var current = $(this).find('a.current');
+    if (current.length > 0)
+      window.location.hash += ('//' + current.text().trim());
   });
 }
 
