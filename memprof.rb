@@ -19,6 +19,10 @@ class MemprofApp < Sinatra::Base
     @db = @dump.db
   end
 
+  get %r'/(demo|panel)?$' do
+    render_panel
+  end
+
   get '/signup' do
     haml :main
   end
@@ -67,7 +71,7 @@ class MemprofApp < Sinatra::Base
       o['hasSubclasses'] = @dump.subclasses_of?(o)
     end
 
-    partial :_classview, :layout => (request.xhr? ? false : :ui), :list => subclasses
+    partial :_classview, :list => subclasses
   end
 
   get '/namespace' do
@@ -88,7 +92,7 @@ class MemprofApp < Sinatra::Base
       end
     end
 
-    partial :_namespace, :layout => (request.xhr? ? false : :ui), :list => classes, :names => names
+    partial :_namespace, :list => classes, :names => names
   end
 
   get '/inbound_refs' do
@@ -103,7 +107,7 @@ class MemprofApp < Sinatra::Base
     if list.count == 0
       return '<center>no references found</center>'
     else
-      partial :_inbound_refs, :layout => (request.xhr? ? false : :ui), :list => list
+      partial :_inbound_refs, :list => list
     end
   end
 
@@ -123,7 +127,7 @@ class MemprofApp < Sinatra::Base
     end
 
     list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }
-    partial :_groupview, :layout => (request.xhr? ? false : :ui), :list => list, :key => key, :where => where
+    partial :_groupview, :list => list, :key => key, :where => where
   end
 
   get '/detailview' do
@@ -136,40 +140,10 @@ class MemprofApp < Sinatra::Base
     if list.count == 0
       return '<center>no matching objects</center>'
     elsif list.count == 1
-      partial :_detailview, :layout => (request.xhr? ? false : :ui), :obj => list.first
+      partial :_detailview, :obj => list.first
     else
-      partial :_listview, :layout => (request.xhr? ? false : :ui), :list => list
+      partial :_listview, :list => list
     end
-  end
-
-  get '/subnav' do
-    json :count => @db.find(Yajl.load params[:where]).count
-  end
-
-  get %r'/(demo|panel)?$' do
-    subview = params[:subview]
-
-    action = case subview
-    when 'subclasses'
-      'classview'
-    when 'group'
-      'groupview'
-    when 'detail'
-      'detailview'
-    when 'references'
-      params[:root] = params[:where]
-      'inbound_refs'
-    else
-      subview = 'namespace'
-      'namespace'
-    end
-
-    # TODO: zomg php haxx
-    xhr = request.xhr?
-    def request.xhr?() true end
-    content = send("GET /#{action}")
-
-    partial :_panel, :layout => xhr ? false : :newui, :content => content, :subview => subview
   end
 
   get '/app.css' do
@@ -178,6 +152,26 @@ class MemprofApp < Sinatra::Base
   end
 
   helpers do
+    def render_panel
+      subview = params[:subview]
+
+      action = case subview
+      when 'subclasses'
+        'classview'
+      when 'group'
+        'groupview'
+      when 'detail'
+        'detailview'
+      when 'references'
+        params[:root] = params[:where]
+        'inbound_refs'
+      else
+        subview = 'namespace'
+        'namespace'
+      end
+
+      partial :_panel, :layout => request.xhr? ? false : :newui, :content => send("GET /#{action}"), :subview => subview
+    end
     def possible_groupings_for(w)
       possible = %w[ type file ]
 
