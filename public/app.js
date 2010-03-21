@@ -192,16 +192,20 @@ $('ul.nav li a:not(.popout)').live('click', function(){
   panel.nextAll().remove();
   panel.find('> div.content').html('<center><img src="/demo/spinner.gif" style="margin: auto"></center>');
 
-  $.get(this.href, function(html){
-    var newPanel = $(html);
-    var hash = panel.attr('url') || '';
+  $.ajax({
+    url: this.href,
+    success: function(html){
+      var newPanel = $(html);
+      var hash = panel.attr('url') || '';
 
-    panel.replaceWith(newPanel);
-    newPanel.attr('url', hash + '//' + escape($.trim(link.text())));
-    newPanel.setupPanel();
+      panel.replaceWith(newPanel);
+      newPanel.attr('url', hash + '//' + escape($.trim(link.text())));
+      newPanel.setupPanel();
 
-    updateBodyWidth();
-    centerPanel(newPanel, true);
+      updateBodyWidth();
+      centerPanel(newPanel, true);
+    },
+    cache: false
   });
 
   return false;
@@ -217,15 +221,19 @@ $('div.panel .content a').live('click', function(){
   var panel = $('<div class="panel additional"><center><img src="/demo/spinner.gif"></center></div>');
   curPanel.nextAll().remove().end().after(panel);
 
-  $.get(this.href, function(html){
-    link.addClass('current');
+  $.ajax({
+    url: this.href,
+    success: function(html){
+      link.addClass('current');
 
-    var newPanel = $(html);
-    panel.replaceWith(newPanel);
-    newPanel.setupPanel();
+      var newPanel = $(html);
+      panel.replaceWith(newPanel);
+      newPanel.setupPanel();
 
-    updateBodyWidth();
-    centerPanel(newPanel, true);
+      updateBodyWidth();
+      centerPanel(newPanel, true);
+    },
+    cache: false
   });
 
   return false;
