@@ -68,8 +68,8 @@
               - while var
                 - if var['data']
                   - key, val = var['data'].to_a.first
-                  - locals[key[1..-1]] = val
-                - var = var['next'] ? @db.find_one(:_id => var['next']) : nil
+                  - locals[key] = val
+                - var = (var['next'] ? @db.find_one(:_id => var['next']) : nil)
 
               - code = h(code)
 
