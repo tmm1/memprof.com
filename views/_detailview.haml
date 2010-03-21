@@ -44,14 +44,40 @@
           - else
             %td.val= show_val obj[key]
 
-    - defn = obj['_id'] if obj.has_key?('n2') and %w[ DEFN METHOD CALL FCALL ARRAY LIT ATTRASGN CONST BLOCK NEWLINE ITER IVAR ].include?(obj['node_type'])
-    - if defn
+  - if obj['type'] == 'node' or obj.has_key?('nd_body')
+    - node = obj['_id']
+    - node = nil if obj['node_type'] == 'OP_ASGN2' and obj.nd_next =~ /^:/
+    - node = nil if %w[ ARGS SCOPE DASGN_CURR CFUNC IFUNC BLOCK_ARG FBODY ATTRSET CREF ].include?(obj['node_type'])
+    - node = @dump.refs.find_one(:refs => node)['_id'] if node and obj['node_type'] == 'BMETHOD'
+
+    - if node
       %tr.spacer.code
       %tr
         %td.code{:colspan=>2}
-          - sexp = Sexp.from_array(@dump.gen_sexp(defn))
+          - sexp = @dump.gen_sexp(node)
+          - unified = Unifier.new.process(sexp)
           - begin
-            %pre.prettyprint=h Ruby2Ruby.new.process(sexp)
+            - code = Ruby2Ruby.new.process(unified)
+            - if obj.has_key?('nd_body')
+              - locals = {}
+
+              - scope = @db.find_one(:_id => obj['scope'])
+              - locals.merge!(Hash[ *scope['variables'].map{ |k,v| [k[1..-1], v] }.flatten ]) if scope and scope['variables']
+
+              - var = @db.find_one(:_id => obj['vars'])
+              - while var
+                - if var['data']
+                  - key, val = var['data'].to_a.first
+                  - locals[key[1..-1]] = val
+                - var = var['next'] ? @db.find_one(:_id => var['next']) : nil
+
+              - code = h(code)
+
+              - if locals.any?
+                - code.gsub!(/\b(#{locals.keys.join('|')})\b/) do |val|
+                  - "<a href='/panel?subview=detail&where=#{Yajl.dump :_id => locals[val]}' title='#{show_val(locals[val], false)}'>#{val}</a>"
+
+            %pre.prettyprint= code
           - rescue
             - Kernel.p $!
 
