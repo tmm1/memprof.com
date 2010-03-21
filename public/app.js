@@ -96,13 +96,17 @@ var replayNext = function(panel){
 };
 
 var updateHash = function(){
-  window.location.hash = '';
+  var hash = '';
+
   $('div.panel').each(function(){
-    window.location.hash += ($(this).attr('url') || '');
+    hash += ($(this).attr('url') || '');
     var current = $(this).find('a.current');
     if (current.length > 0)
-      window.location.hash += ('//' + current.text().trim());
+      hash += ('//' + current.text().trim());
   });
+
+  if (hash)
+    window.location.hash = hash;
 }
 
 var updateBodyWidth = function(){
