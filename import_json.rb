@@ -32,7 +32,7 @@ if true # !File.exists?(refs_file)
     end
 
     #print '.'
-    puts obj['_id']
+    #puts obj['_id']
     refs.delete obj['_id']
 
     if refs.any?
