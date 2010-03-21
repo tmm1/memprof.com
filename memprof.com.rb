@@ -368,7 +368,12 @@ module Memprof
 
         tree << :defn
         tree << name.to_sym
-        tree << gen_sexp(obj.n2, locals)
+        code = gen_sexp(obj.n2, locals)
+        if code.first == :cfunc
+          tree << [:scope, [:block, [:args], [:call, nil, :CFUNCTION, [:array, [:lit, code[1]]]]]]
+        else
+          tree << code
+        end
 
       when 'SCOPE'
         tree << :scope
