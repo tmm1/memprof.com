@@ -25,7 +25,7 @@ $.fn.setupTree = function() {
             sublist.animate({height: '0'}, 'fast', function(){
               var panel = $this.parents('div.panel:first');
               var hash = panel.attr('url') || '';
-              panel.attr('url', hash + '//TOGGLE=' + url);
+              panel.attr('url', hash + '//' + escape('TOGGLE=' + url));
               updateHash();
               replayNext(panel);
 
@@ -84,11 +84,14 @@ var replayNext = function(panel){
       } else {
         var links = panel.find("a:contains("+link+")");
         if (links.length > 0) {
-          var preferred = links.filter(function(){ return $(this).text().trim() == "element_name"; });
+          var preferred = links.filter(function(){ return $.trim($(this).text()) == link; });
+          if (preferred.length == 0)
+            preferred = links;
+
           if (preferred.length > 0)
             preferred.eq(0).click();
           else
-            links.eq(0).click();
+            REPLAY = [];
         }
       }
     }, 300);
@@ -102,7 +105,7 @@ var updateHash = function(){
     hash += ($(this).attr('url') || '');
     var current = $(this).find('a.current');
     if (current.length > 0)
-      hash += ('//' + current.text().trim());
+      hash += ('//' + escape($.trim(current.text())));
   });
 
   if (hash)
@@ -194,7 +197,7 @@ $('ul.nav li a:not(.popout)').live('click', function(){
     var hash = panel.attr('url') || '';
 
     panel.replaceWith(newPanel);
-    newPanel.attr('url', hash + '//' + link.text().trim());
+    newPanel.attr('url', hash + '//' + escape($.trim(link.text())));
     newPanel.setupPanel();
 
     updateBodyWidth();
@@ -274,6 +277,14 @@ $(function(){
   });
 
   REPLAY = window.location.hash.split('//').slice(1);
+  if (REPLAY.length > 0) {
+    var old = REPLAY;
+    REPLAY = [];
+    for (key in old) {
+      REPLAY.push(unescape(old[key]));
+    }
+  }
+
 
   var panel = $('div.panel')
   panel.setupPanel();
