@@ -62,7 +62,7 @@
               - locals = {}
 
               - scope = @db.find_one(:_id => obj['scope'])
-              - locals.merge!(Hash[ *scope['variables'].map{ |k,v| [k[1..-1], v] }.flatten ]) if scope and scope['variables']
+              - locals.merge!(Hash[ *scope['variables'].map{ |k,v| [k, v] }.flatten ]) if scope and scope['variables']
 
               - var = @db.find_one(:_id => obj['vars'])
               - while var
