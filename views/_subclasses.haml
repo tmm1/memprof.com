@@ -3,5 +3,5 @@
     %li
       %a{:href => "/panel?subview=detail&where=#{Yajl.dump :_id => o['_id']}"}= o['name'] || "#&lt;Class:#{o['_id']}&gt;"
       - if o['hasSubclasses']
-        %ul{:url => "/classview?of=#{Yajl.dump :_id => o['_id']}"}
+        %ul{:url => "/subclasses?of=#{Yajl.dump :_id => o['_id']}"}
           %img{:src => '/demo/spinner.gif'}

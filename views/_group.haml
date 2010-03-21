@@ -31,5 +31,5 @@
 
       - if possible = possible_groupings_for(w) and possible.any?
         - subkey = possible.first
-        %ul{:url => "/groupview?key=#{subkey}&where=#{Yajl.dump w}", :possible => possible.join(',')}
+        %ul{:url => "/group?key=#{subkey}&where=#{Yajl.dump w}", :possible => possible.join(',')}
           %img{:src => '/demo/spinner.gif'}

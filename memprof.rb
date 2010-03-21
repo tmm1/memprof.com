@@ -56,7 +56,7 @@ class MemprofApp < Sinatra::Base
     haml :thanks
   end
 
-  get '/classview' do
+  get '/subclasses' do
     if of = params[:of] and !of.empty?
       klass = @db.find_one(Yajl.load of)
       subclasses = @dump.subclasses_of(klass).sort_by{ |o| o['name'] || '' }
@@ -71,7 +71,7 @@ class MemprofApp < Sinatra::Base
       o['hasSubclasses'] = @dump.subclasses_of?(o)
     end
 
-    partial :_classview, :list => subclasses
+    partial :_subclasses, :list => subclasses
   end
 
   get '/namespace' do
@@ -95,7 +95,7 @@ class MemprofApp < Sinatra::Base
     partial :_namespace, :list => classes, :names => names
   end
 
-  get '/inbound_refs' do
+  get '/references' do
     if root = params[:root]
       list = [@db.find_one(Yajl.load root)]
     elsif where = params[:where]
@@ -107,11 +107,11 @@ class MemprofApp < Sinatra::Base
     if list.count == 0
       return '<center>no references found</center>'
     else
-      partial :_inbound_refs, :list => list
+      partial :_references, :list => list
     end
   end
 
-  get '/groupview' do
+  get '/group' do
     params[:key] = nil if params[:key] and params[:key].empty?
 
     if where = params[:where] and !where.empty?
@@ -126,11 +126,11 @@ class MemprofApp < Sinatra::Base
       return '<center>no possible groupings</center>'
     end
 
-    list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }
-    partial :_groupview, :list => list, :key => key, :where => where
+    list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }.first(100)
+    partial :_group, :list => list, :key => key, :where => where
   end
 
-  get '/detailview' do
+  get '/detail' do
     if where = params[:where]
       list = @db.find(Yajl.load where).limit(200)
     else
@@ -140,9 +140,9 @@ class MemprofApp < Sinatra::Base
     if list.count == 0
       return '<center>no matching objects</center>'
     elsif list.count == 1
-      partial :_detailview, :obj => list.first
+      partial :_detail, :obj => list.first
     else
-      partial :_listview, :list => list
+      partial :_list, :list => list
     end
   end
 
@@ -157,14 +157,14 @@ class MemprofApp < Sinatra::Base
 
       action = case subview
       when 'subclasses'
-        'classview'
+        'subclasses'
       when 'group'
-        'groupview'
+        'group'
       when 'detail'
-        'detailview'
+        'detail'
       when 'references'
         params[:root] = params[:where]
-        'inbound_refs'
+        'references'
       else
         subview = 'namespace'
         'namespace'
