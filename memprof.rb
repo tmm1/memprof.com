@@ -263,6 +263,8 @@ class MemprofApp < Sinatra::Base
           elsif nd_type == 'CREF'
             name = show_val(obj.nd_clss, false)
             suffix = " (#{name})" if name
+          elsif nd_type == 'CONST'
+            suffix = " (#{obj.n1[1..-1]})" if obj.n1
           end
           "node:#{nd_type}#{suffix}"
         when 'varmap'
