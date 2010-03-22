@@ -66,7 +66,10 @@ class MemprofApp < Sinatra::Base
     end
     def render_panel(subview=nil)
       where = (params[:where] && !params[:where].empty? ? Yajl.load(params[:where]) : nil)
+      where.delete("$where") if where
+
       of = (params[:of] && !params[:of].empty? ? Yajl.load(params[:of]) : nil)
+      of.delete("$where") if of
 
       content = case subview
       when 'subclasses'
