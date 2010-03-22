@@ -97,20 +97,22 @@ module Memprof
   class Dump
     def initialize(collection_name)
       @@connection ||= Mongo::Connection.new
+      @name = collection_name.to_s
 
-      @db = @@connection.db('memprof_datasets').collection(collection_name.to_s)
+      @db = @@connection.db('memprof_datasets').collection(@name)
+      # background indexing
       @db.create_index(:type)
       @db.create_index(:super)
       @db.create_index(:file)
       @db.create_index(:class)
       @db.create_index('ivars.__attached__')
 
-      @refs = @@connection.db('memprof_datasets').collection("#{collection_name}_refs")
+      @refs = @@connection.db('memprof_datasets').collection("#{@name}_refs")
       @refs.create_index(:refs)
 
       @root_object = @db.find_one(:type => 'class', :name => 'Object')
     end
-    attr_reader :db, :refs, :root_object
+    attr_reader :name, :db, :refs, :root_object
 
     def gen_lit(obj)
       if obj.is_a?(String)
