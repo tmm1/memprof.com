@@ -7,6 +7,10 @@
       %span.val
         %a{:href => url_for('detail', w)}
           - case key
+          - when 'time'
+            - diff = time_range.last - o[key]['$gte']
+            - diff /= 1000
+            #{diff/1000.0} seconds old
           - when 'file'
             - if f = o[key]
               = f.split('/').last(4).join('/')

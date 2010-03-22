@@ -43,8 +43,8 @@
 
       %li
         - if subview == 'group' and key
-          - view = "group:#{key}"
-        %a.popout{:style => 'float:right', :href => url_for(view || subview, @where), :target => '_blank'}
+          - oview = "group:#{key}"
+        %a.popout{:style => 'float:right', :href => url_for(oview || subview, @where), :target => '_blank'}
           %img{:border => 0, :align => 'absmiddle', :src => '/link.png'}
 
   .content

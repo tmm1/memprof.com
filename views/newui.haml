@@ -11,7 +11,7 @@
     #menubar
       %b memprof.com
       %span.sep= "|"
-      - if session.has_key?(:db) || session.has_key?(:beta)
+      - if session.has_key?(:beta)
         %select.collection
           - CONN.db('memprof_datasets').collections.each do |c|
             - next unless c.name =~ /_refs$/

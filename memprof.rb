@@ -174,11 +174,57 @@ class MemprofApp < Sinatra::Base
 
       @group_key = key
 
-      list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }.first(100)
+      if key == 'age'
+        min = @db.find(:time => {:$exists => true}).sort([:time, :asc ]).limit(1).first['time']
+        max = @db.find(:time => {:$exists => true}).sort([:time, :desc]).limit(1).first['time']
+        time_range = [min, max]
+
+        start = 50_000
+        curr = max
+        time_slices = []
+
+        while curr > min
+          time_slices << curr
+          curr -= start
+          start *= 2
+        end
+        time_slices << min
+
+        result = @db.map_reduce(
+          'function(){ for (var i=0; i<time_slices.length; i++) { if (this.time >= time_slices[i]) { emit(time_slices[i], 1); break; } } }',
+          'function(k,vals){ var n=0; for(var i=0; i<vals.length; i++) n+=vals[i]; return n }',
+          :scope => {:time_slices => time_slices},
+          :query => where.merge(:time => {:$exists => true}),
+          :verbose => true
+        )
+
+        slices = []
+        key = 'time'
+        list = result.find.sort_by{ |o| -o['_id'] }.map{ |o| o['_id'] = o['_id'].to_i; slices << o['_id']; o }
+        list.map! do |o|
+          a = o['_id']
+          w = {'$gte' => a}
+          if n = slices.select{ |t| t > a }.last
+            w['$lt'] = n
+          end
+          {'count' => o['value'], 'time' => w}
+        end
+
+        result.drop
+      else
+        list = @db.group(
+          [key],
+          where,
+          {:count=>0},
+          'function(d,o){ o.count++ }'
+        ).sort_by{ |o| -o['count'] }.first(100)
+      end
+
       partial :_group,
         :list => list,
         :key => key,
-        :where => where
+        :where => where,
+        :time_range => time_range
     end
     def render_detail(where=nil)
       if where
@@ -214,6 +260,7 @@ class MemprofApp < Sinatra::Base
       end
 
       possible << 'line' if w.has_key?('file')
+      possible << 'age' unless w.has_key?('time')
 
       possible -= w.keys
       possible -= %w[type] if w.has_key?('class_name')
