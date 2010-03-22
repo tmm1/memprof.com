@@ -5,7 +5,7 @@
 
       %span.num= o['count'].to_i
       %span.val
-        %a{:href => "/panel?subview=detail&where=#{Yajl.dump w}"}
+        %a{:href => url_for('detail', w)}
           - case key
           - when 'file'
             - if f = o[key]
@@ -31,5 +31,6 @@
 
       - if possible = possible_groupings_for(w) and possible.any?
         - subkey = possible.first
-        %ul{:url => "/group?key=#{subkey}&where=#{Yajl.dump w}", :possible => possible.join(',')}
+
+        %ul{:url => url_for("group:#{subkey}", nil, w)}
           %img{:src => '/demo/spinner.gif'}

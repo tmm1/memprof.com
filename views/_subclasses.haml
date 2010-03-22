@@ -1,7 +1,8 @@
 %ul
   - list.each do |o|
     %li
-      %a{:href => "/panel?subview=detail&where=#{Yajl.dump :_id => o['_id']}"}= o['name'] || "#&lt;Class:#{o['_id']}&gt;"
+      %a{:href => url_for('detail', :_id => o['_id'])}= o['name'] || h("#<Class:#{o['_id']}>")
+
       - if o['hasSubclasses']
-        %ul{:url => "/subclasses?of=#{Yajl.dump :_id => o['_id']}"}
+        %ul{:url => url_for('subclasses', nil, :_id => o['_id'])}
           %img{:src => '/demo/spinner.gif'}

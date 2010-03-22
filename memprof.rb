@@ -14,37 +14,20 @@ DB = CONN.db('memprof_site')
 require 'memprof.com'
 
 class MemprofApp < Sinatra::Base
-  before do
-    @dump = Memprof::Dump.new(session[:db] || :stdlib)
+  get '/dump/:dump/?:view?' do
+    @dump = Memprof::Dump.new(params[:dump])
     @db = @dump.db
+    pass unless @db.count > 0
+
+    render_panel(params[:view])
   end
 
   get %r'/(demo|panel)?$' do
-    render_panel
+    redirect '/dump/stdlib'
   end
 
   get '/signup' do
     haml :main
-  end
-
-  get '/beta' do
-    session[:beta] = true
-    redirect '/'
-  end
-
-  get '/logout' do
-    session.delete(:beta)
-    session.delete(:db)
-    redirect '/'
-  end
-
-  get '/db' do
-    session[:db] || 'stdlib'
-  end
-
-  get '/db/:db' do
-    session[:db] = params[:db]
-    redirect '/'
   end
 
   post '/email' do
@@ -56,94 +39,14 @@ class MemprofApp < Sinatra::Base
     haml :thanks
   end
 
-  get '/subclasses' do
-    if of = params[:of] and !of.empty?
-      klass = @db.find_one(Yajl.load of)
-      subclasses = @dump.subclasses_of(klass).sort_by{ |o| o['name'] || '' }
-    elsif where = params[:where] and !where.empty?
-      subclasses = [@db.find_one(Yajl.load where)]
-    else
-      subclasses = [@dump.root_object]
-    end
-
-    subclasses.compact!
-    subclasses.each do |o|
-      o['hasSubclasses'] = @dump.subclasses_of?(o)
-    end
-
-    partial :_subclasses, :list => subclasses
+  get '/beta' do
+    session[:beta] = true
+    redirect '/'
   end
 
-  get '/namespace' do
-    if where = params[:where] and !where.empty?
-      obj = @db.find_one(Yajl.load where)
-    else
-      obj = @dump.root_object
-    end
-
-    constants = obj['ivars'].reject{ |k,v| k !~ /^[A-Z]/ }
-    names = constants.invert
-    classes = @db.find(:type => {:$in => %w[iclass class module]}, :_id => {:$in => constants.values}).to_a.sort_by{ |o| names[o['_id']] || o['name'] }
-
-    classes.each do |o|
-      unless o['name'] == 'Object'
-        vars = o['ivars'].reject{ |k,v| k !~ /^[A-Z]/ }
-        o['hasChildren'] = !!@db.find_one(:type => {:$in => %w[iclass class module]}, :_id => {:$in => vars.values})
-      end
-    end
-
-    partial :_namespace, :list => classes, :names => names
-  end
-
-  get '/references' do
-    if root = params[:root]
-      list = [@db.find_one(Yajl.load root)]
-    elsif where = params[:where]
-      list = @dump.refs.find(Yajl.load where).limit(25)
-    else
-      list = []
-    end
-
-    if list.count == 0
-      return '<center>no references found</center>'
-    else
-      partial :_references, :list => list
-    end
-  end
-
-  get '/group' do
-    params[:key] = nil if params[:key] and params[:key].empty?
-
-    if where = params[:where] and !where.empty?
-       where = Yajl.load(where)
-       key = params[:key] || possible_groupings_for(where).first
-    else
-      key = (params[:key] ||= 'file')
-      where = nil
-    end
-
-    if key.nil?
-      return '<center>no possible groupings</center>'
-    end
-
-    list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }.first(100)
-    partial :_group, :list => list, :key => key, :where => where
-  end
-
-  get '/detail' do
-    if where = params[:where]
-      list = @db.find(Yajl.load where).limit(200)
-    else
-      list = [@dump.root_object]
-    end
-
-    if list.count == 0
-      return '<center>no matching objects</center>'
-    elsif list.count == 1
-      partial :_detail, :obj => list.first
-    else
-      partial :_list, :list => list
-    end
+  get '/logout' do
+    session.delete(:beta)
+    redirect '/'
   end
 
   get '/app.css' do
@@ -152,25 +55,144 @@ class MemprofApp < Sinatra::Base
   end
 
   helpers do
-    def render_panel
-      subview = params[:subview]
+    def url_for(subview, where=nil, of=nil)
+      url = "/dump/#{@dump.name}/#{subview}"
+      if where or of
+        url += "?"
+        url += "where=#{Yajl.dump where}" if where
+        url += "of=#{Yajl.dump of}" if of
+      end
+      url
+    end
+    def render_panel(subview=nil)
+      where = (params[:where] && !params[:where].empty? ? Yajl.load(params[:where]) : nil)
+      of = (params[:of] && !params[:of].empty? ? Yajl.load(params[:of]) : nil)
 
-      action = case subview
+      content = case subview
       when 'subclasses'
-        'subclasses'
-      when 'group'
-        'group'
+        render_subclasses(where, of)
+      when /^group:?(.*)$/
+        subview = 'group'
+        render_group(where || of, $1.empty? ? nil : $1)
       when 'detail'
-        'detail'
+        render_detail(where)
       when 'references'
-        params[:root] = params[:where]
-        'references'
+        render_references(where, of)
       else
         subview = 'namespace'
-        'namespace'
+        render_namespace(where || of)
       end
 
-      partial :_panel, :layout => request.xhr? ? false : :newui, :content => send("GET /#{action}"), :subview => subview
+      @where, @of = where, of
+
+      if of
+        content
+      else
+        partial :_panel,
+          :layout => request.xhr? ? false : :newui,
+          :content => content,
+          :subview => subview
+      end
+    end
+    def render_namespace(where=nil)
+      if where
+        obj = @db.find_one(where)
+      else
+        obj = @dump.root_object
+      end
+
+      constants = obj['ivars'].reject{ |k,v| k !~ /^[A-Z]/ }
+      names = constants.invert
+
+      classes = @db.find(
+        :type => {:$in => %w[iclass class module]},
+        :_id  => {:$in => constants.values}
+      ).to_a.sort_by{ |o| names[o['_id']] || o['name'] }
+
+      classes.each do |o|
+        unless o['name'] == 'Object'
+          vars = o['ivars'].reject{ |k,v| k !~ /^[A-Z]/ }
+          o['hasChildren'] = !!@db.find_one(
+            :type => {:$in => %w[iclass class module]},
+            :_id  => {:$in => vars.values}
+          )
+        end
+      end
+
+      partial :_namespace,
+        :list => classes,
+        :names => names
+    end
+    def render_subclasses(where=nil,of=nil)
+      if of
+        klass = @db.find_one(of)
+        subclasses = @dump.subclasses_of(klass).sort_by{ |o| o['name'] || '' }
+      elsif where
+        subclasses = [@db.find_one(where)]
+      else
+        subclasses = [@dump.root_object]
+      end
+
+      subclasses.compact!
+      subclasses.each do |o|
+        o['hasSubclasses'] = @dump.subclasses_of?(o)
+      end
+
+      partial :_subclasses,
+        :list => subclasses
+    end
+    def render_references(where=nil,of=nil)
+      if where
+        list = [@db.find_one(where)]
+      elsif of
+        list = @dump.refs.find(of).limit(25)
+      else
+        list = []
+      end
+
+      if list.count == 0
+        return '<center>no references found</center>'
+      else
+        partial :_references,
+          :list => list
+      end
+    end
+    def render_group(where=nil,key=nil)
+      if where
+         key ||= possible_groupings_for(where).first
+      else
+        key ||= 'file'
+        where = nil
+      end
+
+      if key.nil?
+        return '<center>no possible groupings</center>'
+      end
+
+      @group_key = key
+
+      list = @db.group([key], where, {:count=>0}, 'function(d,o){ o.count++ }').sort_by{ |o| -o['count'] }.first(100)
+      partial :_group,
+        :list => list,
+        :key => key,
+        :where => where
+    end
+    def render_detail(where=nil)
+      if where
+        list = @db.find(where).limit(200)
+      else
+        list = [@dump.root_object]
+      end
+
+      if list.count == 0
+        return '<center>no matching objects</center>'
+      elsif list.count == 1
+        partial :_detail,
+          :obj => list.first
+      else
+        partial :_list,
+          :list => list
+      end
     end
     def possible_groupings_for(w)
       possible = %w[ type file ]
@@ -205,7 +227,7 @@ class MemprofApp < Sinatra::Base
     end
     def show_addr val
       if val =~ /^0x/
-        "<a href='/panel?subview=detail&where=#{Yajl.dump :_id => val}'>#{val}</a>"
+        "<a href='#{url_for 'detail', :_id => val}'>#{val}</a>"
       else
         '&nbsp;'
       end
@@ -214,7 +236,7 @@ class MemprofApp < Sinatra::Base
       case val
       when nil
         'nil'
-      when OrderedHash, /^0x/
+      when OrderedHash, /^0x/, 'globals'
         if val.is_a?(OrderedHash)
           obj = val
         else
@@ -292,7 +314,7 @@ class MemprofApp < Sinatra::Base
         end
 
         if as_link
-          "<a href='/panel?subview=detail&where=#{Yajl.dump :_id => obj['_id']}'>#{h show}</a>"
+          "<a href='#{url_for 'detail', :_id => obj['_id']}'>#{h show}</a>"
         else
           show
         end
@@ -308,7 +330,7 @@ class MemprofApp < Sinatra::Base
   set :server, 'thin'
   set :port, 7006
   set :public, File.expand_path('../public', __FILE__)
-  enable :static
+  enable :static, :logging
   use Rack::Session::Cookie, :key => 'memprof_session', :secret => 'noisses_forpmem'
 end
 

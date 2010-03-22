@@ -10,7 +10,7 @@
           %td.val
             - w = {key => val}
             - w['file'] = obj['file'] if key == 'line'
-            %a{:href => "/panel?subview=detail&where=#{Yajl.dump w}"}
+            %a{:href => url_for('detail', w)}
               - if key == 'file'
                 = val.split('/').last(4).join('/')
               - else
@@ -75,7 +75,7 @@
 
               - if locals.any?
                 - code.gsub!(/\b(#{locals.keys.join('|')})\b/) do |val|
-                  - "<a href='/panel?subview=detail&where=#{Yajl.dump :_id => locals[val]}' title='#{show_val(locals[val], false)}'>#{val}</a>"
+                  - "<a href='#{url_for 'detail', :_id => locals[val]}' title='#{show_val(locals[val], false)}'>#{val}</a>"
 
             %pre.prettyprint= code
           - rescue
@@ -93,20 +93,20 @@
       %td.key ancestors
       %td.val
         - ancestors.each_with_index do |a, i|
-          %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => a['_id']}"}= show_val a['_id']
+          = show_val a['_id']
           %br/
 
     - instances = @db.find(:class => obj['_id']).count
     %tr
       %td.key instances
       %td.val
-        %a{:href => "/panel?subview=detail&where=#{Yajl.dump :class => obj['_id']}"}= instances
+        %a{:href => url_for('detail', :class => obj['_id'])}= instances
 
     - subclasses = @db.find(:super => obj['_id']).count
     %tr
       %td.key subclasses
       %td.val
-        %a{:href => "/panel?subview=detail&where=#{Yajl.dump :super => obj['_id']}"}= subclasses
+        %a{:href => url_for('detail', :super => obj['_id'])}= subclasses
 
   - if %w[ scope globals data ].include?(obj['type']) and list = obj['variables'] and list.any?
     %tr.spacer.variables
@@ -129,7 +129,7 @@
       - if o['data']
         - key, val = o['data'].to_a.first
         %tr
-          %td.key <a href='/panel?subview=detail&where=#{Yajl.dump :_id => o['_id']}'>#{key}</a>
+          %td.key <a href='#{url_for 'detail', :_id => o['_id']}'>#{key}</a>
           %td.val= show_val val
 
   - if obj['type'] == 'array' and list = obj['data'] and list.any?

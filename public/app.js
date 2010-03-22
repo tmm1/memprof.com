@@ -17,7 +17,7 @@ $.fn.setupTree = function() {
 
         $this.addClass('loaded');
         var sublist = $this.find('>ul');
-        var url = sublist.attr('url') || '/test';
+        var url = sublist.attr('url');
 
         $.ajax({
           url: url,
@@ -25,7 +25,7 @@ $.fn.setupTree = function() {
             sublist.animate({height: '0'}, 'fast', function(){
               var panel = $this.parents('div.panel:first');
               var hash = panel.attr('url') || '';
-              panel.attr('url', hash + '//' + escape('TOGGLE=' + url));
+              panel.attr('url', hash + '//TOGGLE=' + url.replace(/^\/dump\/.+?\//,''));
               updateHash();
               replayNext(panel);
 
@@ -77,22 +77,19 @@ var replayNext = function(panel){
   if (link) {
     setTimeout(function(){
       if (link.match(/^TOGGLE=/)) {
-        var ul = panel.find("ul[url="+link.slice(7)+"]");
+        var ul = panel.find("ul[url*="+link.slice(7)+"]");
         if (ul.length) {
           ul.prevAll('div.hitarea:first').click();
         }
+      } else if (link.match(/^CHANGE=/)) {
+        var select = $('select.group_key:last');
+        select.val(link.slice(7)).change();
       } else {
-        var links = panel.find("a:contains("+link+")");
-        if (links.length > 0) {
-          var preferred = links.filter(function(){ return $.trim($(this).text()) == link; });
-          if (preferred.length == 0)
-            preferred = links;
-
-          if (preferred.length > 0)
-            preferred.eq(0).click();
-          else
-            REPLAY = [];
-        }
+        var links = panel.find("a[href*='"+link+"']");
+        if (links.length > 0)
+          links.eq(0).click();
+        else
+          REPLAY = [];
       }
     }, 300);
   }
@@ -105,7 +102,7 @@ var updateHash = function(){
     hash += ($(this).attr('url') || '');
     var current = $(this).find('a.current');
     if (current.length > 0)
-      hash += ('//' + escape($.trim(current.text())));
+      hash += ('//' + current.attr('href').replace(/^\/dump\/.+?\//,''));
   });
 
   if (hash)
@@ -197,9 +194,15 @@ $('ul.nav li a:not(.popout)').live('click', function(){
     success: function(html){
       var newPanel = $(html);
       var hash = panel.attr('url') || '';
+      var link_text = $.trim(link.text());
 
       panel.replaceWith(newPanel);
-      newPanel.attr('url', hash + '//' + escape($.trim(link.text())));
+
+      if (link_text.match(/^group\s*by/))
+        newPanel.attr('url', hash + '//CHANGE=' + escape($.trim($('select.group_key').val())));
+      else
+        newPanel.attr('url', hash + '//' + link.attr('href').replace(/^\/dump\/.+?\//,''));
+
       newPanel.setupPanel();
 
       updateBodyWidth();
@@ -242,7 +245,7 @@ $('div.panel .content a').live('click', function(){
 $('div.panel ul.nav li.group select.group_key').live('change', function(){
   var select = $(this);
   var link = select.parents('a:first');
-  link.attr('href', link.attr('href').replace(/&key=.*$/,'') + "&key=" + select.val());
+  link.attr('href', link.attr('href').replace(/group:[a-z]+/,'group:'+select.val()));
   link.click();
 });
 

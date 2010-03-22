@@ -1,48 +1,50 @@
-- where = params[:root] || params[:where]
-- where ||= ''
-- num = where.empty? ? @db.count : @db.find(Yajl.load where).count
-- key = params[:key]
+- num = @where ? @db.find(@where).count : @db.count
+- key = @group_key
 
 .panel
   %form#search
     #query
-      - if !where.empty?
-        %textarea{:readonly => 'true'}= where
+      - if @where
+        %textarea{:readonly => 'true'}= Yajl.dump @where
 
     %ul.nav
       %li.objects
         #{num} object#{num == 1 ? '' : 's'}
 
-      - unless where.empty?
+      - if @where
         %li.detail
-          %a{:href => '/panel?subview=detail&where='+where, :class => subview == 'detail' && 'selected'} #{num > 1 && where != '{}' ? 'list' : 'detail'}
+          %a{:href => url_for('detail', @where), :class => subview == 'detail' && 'selected'} #{num > 1 && @where ? 'list' : 'detail'}
 
-      - if where.empty?
+      - unless @where
         %li.namespace
-          %a{:href => '/panel?subview=namespace&where='+where, :class => subview == 'namespace' && 'selected'} namespace
+          %a{:href => url_for('namespace', @where), :class => subview == 'namespace' && 'selected'} namespace
 
-      - if where.empty? or (num == 1 and obj = @db.find_one(Yajl.load where) and %w[ class iclass module ].include?(obj['type']))
+      - if @where.nil? or (num == 1 and obj = @db.find_one(@where) and %w[ class iclass module ].include?(obj['type']))
         %li.subclasses
-          %a{:href => '/panel?subview=subclasses&where='+where, :class => subview == 'subclasses' && 'selected'} subclasses
+          %a{:href => url_for('subclasses', @where), :class => subview == 'subclasses' && 'selected'} subclasses
 
       - if num == 1
         %li.references
-          %a{:href => '/panel?subview=references&where='+where, :class => subview == 'references' && 'selected'} references
+          %a{:href => url_for('references', @where), :class => subview == 'references' && 'selected'} references
 
-      - if where.empty? or num > 1
+      - if @where.nil? or num > 1
         %li.group
-          %a{:href => "/panel?subview=group&where=#{where}&key=#{key}", :class => subview == 'group' && 'selected'}
+          - view = "group"
+          - view += ":#{key}" if key
+          %a{:href => url_for(view, @where), :class => subview == 'group' && 'selected'}
             group
             - if subview == 'group'
-              - possible = possible_groupings_for(where.empty? ? {} : Yajl.load(where))
+              - possible = possible_groupings_for(@where || {})
               - if possible.any?
                 by
                 %select.group_key
                   - possible.each do |name|
-                    %option{:selected => name == params[:key]}= name
+                    %option{:selected => name == key}= name
 
       %li
-        %a.popout{:style => 'float:right', :href => "/demo?subview=#{subview}&where=#{where}&key=#{key}", :target => '_blank'}
+        - if subview == 'group' and key
+          - view = "group:#{key}"
+        %a.popout{:style => 'float:right', :href => url_for(view || subview, @where), :target => '_blank'}
           %img{:border => 0, :align => 'absmiddle', :src => '/link.png'}
 
   .content

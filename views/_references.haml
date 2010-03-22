@@ -1,9 +1,8 @@
 %ul
   - list.each do |o|
     %li
-      %a{:href => "/panel?subview=detail&where=#{Yajl.dump :_id => o['_id']}"}= show_val o['_id']
+      = show_val o['_id']
 
       - if o['_id'] != @dump.root_object['_id'] && @dump.refs.find_one(:refs => o['_id'])
-        - where = Yajl.dump({:refs => o['_id']})
-        %ul{:url => "/references?where=#{where}"}
+        %ul{:url => url_for('references', nil, :refs => o['_id'])}
           %img{:src => '/demo/spinner.gif'}

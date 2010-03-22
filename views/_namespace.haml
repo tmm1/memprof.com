@@ -1,9 +1,8 @@
 %ul
   - list.each do |o|
     %li
-      %a{:href => "/panel?subview=detail&where=#{Yajl.dump :_id => o['_id']}"}= names[o['_id']] || o['name']
+      %a{:href => url_for('detail', :_id => o['_id'])}= names[o['_id']] || o['name']
 
       - if o['hasChildren']
-        - where = Yajl.dump({:_id => o['_id']})
-        %ul{:url => "/namespace?where=#{where}"}
+        %ul{:url => url_for('namespace', nil, :_id => o['_id'])}
           %img{:src => '/demo/spinner.gif'}
