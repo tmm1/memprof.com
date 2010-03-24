@@ -45,24 +45,25 @@ class MemprofApp < Sinatra::Base
     end
 
     dir = "dumps/#{key}"
+    basename = "#{dir}/#{label}"
     `mkdir #{dir}` unless File.exist?(dir)
 
     tempfile.close
-    File.rename(tempfile.path, "#{dir}/#{label}.json.gz")
+    File.rename(tempfile.path, "#{basename}.json.gz")
 
-    EM.system("gunzip -f #{dir}/#{label}.json.gz") {|o1, s1|
+    EM.system("gunzip -f #{basename}.json.gz") {|o1, s1|
       if s1.exitstatus == 0
-        EM.system("ruby import_json.rb #{dir}/#{label}.json") {|o2, s2|
+        EM.system("ruby import_json.rb #{basename}.json") {|o2, s2|
           if s2.exitstatus == 0
             body "Success! Visit http://www.memprof.com/dumps/#{label} to view."
           else
             body "Failed to import your file!"
           end
-          File.delete("#{dir}/#{label}.json")
-          File.delete("#{dir}/#{label}_refs.json")
+          File.delete("#{basename}.json")
+          File.delete("#{basename}_refs.json")
         }
       else
-        File.delete("#{dir}/#{label}.json.gz")
+        File.delete("#{basename}.json.gz")
         body "Failed to decompress your file!"
       end
     }
