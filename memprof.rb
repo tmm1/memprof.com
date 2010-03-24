@@ -62,7 +62,7 @@ class MemprofApp < Sinatra::Base
           File.delete("#{dir}/#{label}_refs.json")
         }
       else
-        File.delete(filename)
+        File.delete("#{dir}/#{label}.json.gz")
         body "Failed to decompress your file!"
       end
     }
