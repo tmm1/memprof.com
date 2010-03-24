@@ -1,6 +1,7 @@
 source :rubygems
 
 gem 'sinatra', '0.9.6'
+gem 'async_sinatra'
 gem 'thin'
 gem 'haml'
 gem 'sequel'

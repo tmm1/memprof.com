@@ -3,6 +3,7 @@ require 'bundler'
 Bundler.setup
 
 require 'sinatra/base'
+require 'sinatra/async'
 require 'haml'
 require 'sass'
 require 'yajl'
@@ -14,6 +15,59 @@ DB = CONN.db('memprof_site')
 require 'memprof.com'
 
 class MemprofApp < Sinatra::Base
+  register Sinatra::Async
+
+  apost '/upload' do
+    upload = params["upload"]
+    label  = params["label"]
+    key    = params["key"]
+
+    user = begin
+      DB.collection('users').find_one(:_id => Mongo::ObjectID.from_string(key))
+    rescue Mongo::InvalidObjectID
+      nil
+    end
+
+    unless user
+      body "Bad API key."
+      return
+    end
+
+    unless upload && tempfile = upload[:tempfile]
+      body "Failed - no file."
+      return
+    end
+
+    # Slight deterrent to people uploading bullshit files?
+    unless upload[:type] == "application/x-gzip"
+      body "Failed."
+      return
+    end
+
+    dir = "dumps/#{key}"
+    `mkdir #{dir}` unless File.exist?(dir)
+
+    tempfile.close
+    File.rename(tempfile.path, "#{dir}/#{label}.json.gz")
+
+    EM.system("gunzip -f #{dir}/#{label}.json.gz") {|o1, s1|
+      if s1.exitstatus == 0
+        EM.system("ruby import_json.rb #{dir}/#{label}.json") {|o2, s2|
+          if s2.exitstatus == 0
+            body "Success! Visit http://www.memprof.com/dumps/#{label} to view."
+          else
+            body "Failed to import your file!"
+          end
+          File.delete("#{dir}/#{label}.json")
+          File.delete("#{dir}/#{label}_refs.json")
+        }
+      else
+        File.delete(filename)
+        body "Failed to decompress your file!"
+      end
+    }
+  end
+
   get '/dump/:dump/?:view?' do
     @dump = Memprof::Dump.new(params[:dump])
     @db = @dump.db
