@@ -19,7 +19,7 @@ class MemprofApp < Sinatra::Base
 
   apost '/upload' do
     upload = params["upload"]
-    label  = params["label"]
+    name   = params["name"]
     key    = params["key"]
 
     user = begin
@@ -32,21 +32,29 @@ class MemprofApp < Sinatra::Base
       body "Bad API key."
       return
     end
-
     unless upload && tempfile = upload[:tempfile]
       body "Failed - no file."
       return
     end
-
+    unless name && !name.empty?
+      body "Failed - no dump name."
+      return
+    end
     # Slight deterrent to people uploading bullshit files?
     unless upload[:type] == "application/x-gzip"
       body "Failed."
       return
     end
 
-    dir = "dumps/#{key}"
-    basename = "#{dir}/#{label}"
-    `mkdir #{dir}` unless File.exist?(dir)
+    # we need the dump id to use it as the collection name for the dump import.
+    # we'll delete it if the import fails for some reason.
+    dump_id = DB.collection('dumps').insert(
+      :name => name,
+      :user_id => user['_id'],
+      :created_at => Time.now
+    )
+
+    basename = "dumps/#{dump_id.to_s}"
 
     tempfile.close
     File.rename(tempfile.path, "#{basename}.json.gz")
@@ -55,15 +63,21 @@ class MemprofApp < Sinatra::Base
       if s1.exitstatus == 0
         EM.system("ruby import_json.rb #{basename}.json") {|o2, s2|
           if s2.exitstatus == 0
-            body "Success! Visit http://www.memprof.com/dumps/#{label} to view."
+            (user['dumps'] ||= []) << dump_id
+            DB.collection('users').save(user)
+            body "Success! Visit http://www.memprof.com/dump/#{dump_id.to_s} to view."
           else
+            # make sure we remove the dump if it failed
+            DB.collection('dumps').remove(:_id => dump_id)
             body "Failed to import your file!"
           end
-          File.delete("#{basename}.json")
-          File.delete("#{basename}_refs.json")
+          File.delete("#{basename}.json") if File.exist?("#{basename}.json")
+          File.delete("#{basename}_refs.json") if File.exist?("#{basename}_refs.json")
         }
       else
-        File.delete("#{basename}.json.gz")
+        # make sure we remove the dump if it failed
+        DB.collection('dumps').remove(:_id => dump_id)
+        File.delete("#{basename}.json.gz") if File.exist?("#{basename}.json.gz")
         body "Failed to decompress your file!"
       end
     }
