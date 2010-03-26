@@ -134,7 +134,7 @@
 
   - if obj['type'] == 'array' and list = obj['data'] and list.any?
     %tr.spacer.array_data
-    - list.each_with_index do |val,key|
+    - list.first(200).each_with_index do |val,key|
       %tr
         %td.key= key
         %td.val= show_val val
