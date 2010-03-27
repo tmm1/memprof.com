@@ -48,10 +48,17 @@ find_sccs() {
   connection->ensureIndex("memprof_datasets.stdlib_groups", BSON("members" << 1));
 }
 
+typedef map< int, set<int> > Graph;
+Graph *metaGraph = NULL;
+
 void
-calc_meta_tree() {
+calc_meta_graph() {
   BSONObj o, p, q;
   BSONObj emptyObj = BSONObj();
+
+  if (metaGraph)
+    delete metaGraph;
+  metaGraph = new Graph();
 
   auto_ptr<DBClientCursor> cursor = connection->query("memprof_datasets.stdlib_groups", emptyObj);
   while( cursor->more() ) {
@@ -84,13 +91,22 @@ calc_meta_tree() {
 
     if (refs.size() > 0) {
       vector<int> refs_v(refs.begin(), refs.end());
-      connection->update("memprof_datasets.stdlib_groups", BSON("_id" << o["_id"]), BSON("$set" << BSON("refs" << refs_v)));
+      connection->update("memprof_datasets.stdlib_groups", BSON("_id" << id), BSON("$set" << BSON("refs" << refs_v)));
+
+      (*metaGraph)[id] = refs;
     }
   }
+
+  cout << endl << "  created w/ size: " << metaGraph->size();
 }
+
+map<int,int>* numMembers;
 
 int
 dfs_size_for(int node) {
+  map<int,int>::iterator members_it;
+  Graph::iterator graph_it;
+
   set<int> visited;
 
   vector<int> to_visit;
@@ -105,25 +121,37 @@ dfs_size_for(int node) {
     if (visited.find(cur) == visited.end()) {
       visited.insert(cur);
 
-      auto_ptr<DBClientCursor> cursor = connection->query("memprof_datasets.stdlib_groups", BSON("_id" << cur));
-      if (cursor->more()) { // should get exactly one response
-        BSONObj o = cursor->next();
+      int n_members = 0;
+      members_it = numMembers->find(cur);
 
-        BSONObjIterator i( o["members"].embeddedObject() );
-        while (i.more()) {
-          BSONElement e = i.next();
-          size += 1;
-        }
+      if (members_it == numMembers->end()) {
+        auto_ptr<DBClientCursor> cursor = connection->query("memprof_datasets.stdlib_groups", BSON("_id" << cur));
+        if (cursor->more()) { // should get exactly one response
+          BSONObj o = cursor->next();
 
-        if (o.hasField("refs")) {
-          BSONObjIterator ii( o["refs"].embeddedObject() );
-          while (ii.more()) {
-            BSONElement e = ii.next();
-            to_visit.push_back(e.numberInt());
+          BSONObjIterator i( o["members"].embeddedObject() );
+          while (i.more()) {
+            BSONElement e = i.next();
+            n_members += 1;
           }
-        }
 
+          (*numMembers)[cur] = n_members;
+        }
+      } else {
+        n_members = members_it->second;
       }
+
+      size += n_members;
+
+      graph_it = metaGraph->find(cur);
+      if (graph_it != metaGraph->end()) {
+        set<int> refs = graph_it->second;
+        set<int>::iterator refs_it = refs.begin();
+        while (refs_it != refs.end()) {
+          to_visit.push_back(*refs_it++);
+        }
+      }
+
     }
   }
 
@@ -133,6 +161,7 @@ dfs_size_for(int node) {
 void
 calc_sizes() {
   BSONObj emptyObj = BSONObj();
+  numMembers = new map<int,int>();
 
   auto_ptr<DBClientCursor> cursor = connection->query("memprof_datasets.stdlib_groups", emptyObj);
   while( cursor->more() ) {
@@ -143,6 +172,8 @@ calc_sizes() {
 
     connection->update("memprof_datasets.stdlib_groups", BSON("_id" << id), BSON("$set" << BSON("size" << size)));
   }
+
+  delete numMembers;
 }
 
 void
@@ -155,7 +186,7 @@ run() {
   cout << endl << "calculating meta graph...";
   cout.flush();
 
-  calc_meta_tree();
+  calc_meta_graph();
 
   cout << endl << "calculating tree sizes...";
   cout.flush();
