@@ -263,7 +263,7 @@ class MemprofApp < Sinatra::Base
           'function(){ for (var i=0; i<time_slices.length; i++) { if (this.time >= time_slices[i]) { emit(time_slices[i], 1); break; } } }',
           'function(k,vals){ var n=0; for(var i=0; i<vals.length; i++) n+=vals[i]; return n }',
           :scope => {:time_slices => time_slices},
-          :query => where.merge(:time => {:$exists => true}),
+          :query => (where || {}).merge(:time => {:$exists => true}),
           :verbose => true
         )
 
