@@ -11,7 +11,7 @@ void do_each_node(node_callback cb) {
   Query q = Query(BSONObj());
   BSONObj fields = BSON("_id" << 1);
 
-  auto_ptr<DBClientCursor> cursor = connection->query("memprof_datasets.stdlib_refs", q, 0, 0, &fields, 0, 0);
+  auto_ptr<DBClientCursor> cursor = connection->query("memprof_datasets.stdlib_refs", q, 0, 0, &fields, 0);
   while( cursor->more() ) {
     o = cursor->next();
     cb(o["_id"].str());
@@ -150,12 +150,12 @@ run() {
   cout << "finding strongly connected components...";
   cout.flush();
 
-  // find_sccs();
+  find_sccs();
 
   cout << endl << "calculating meta graph...";
   cout.flush();
 
-  // calc_meta_tree();
+  calc_meta_tree();
 
   cout << endl << "calculating tree sizes...";
   cout.flush();
