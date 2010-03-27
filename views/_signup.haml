@@ -1,0 +1,10 @@
+%h2 memprof.com is currently in private beta.
+
+%p If you would like to receive updates about memprof.com, and an opportunity to participate in the beta, you can enter your email address below.
+%span= "Email:"
+%form{:action => '/email', :method => 'POST'}
+  %input{:type => 'text', :name => 'email_addr', :value => '', :maxlength=>256}
+  %input{:type => 'submit', :name => 'submit', :value => 'I want it.'}
+
+%p
+  %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!

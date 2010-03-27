@@ -104,6 +104,14 @@ class MemprofApp < Sinatra::Base
     partial :_howto
   end
 
+  get '/pricing' do
+    partial :_pricing
+  end
+
+  get '/signup' do
+    partial :_signup
+  end
+
   post '/email' do
     DB.collection('emails').insert(
       :email => params[:email_addr],

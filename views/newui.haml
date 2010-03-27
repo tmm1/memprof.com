@@ -18,16 +18,13 @@
         - get_dumps().each do |dump|
           %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
       %span.sep= "|"
+      %a{:href => '/signup', :rel => 'facebox'} signup
+      %span.sep= "|"
+      %a{:href => '/pricing', :rel => 'facebox'} pricing
+      %span.sep= "|"
       %a{:href => '/howto', :rel => 'facebox'} howto
       %span.sep= "|"
-      %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
-      %span.sep= "|"
       %a{:href => 'mailto:gc@memprof.com'} contact us
-      %span.sep= "|"
-      %span= "Email:"
-      %form{:action => '/email', :method => 'POST'}
-        %input{:type => 'text', :name => 'email_addr', :value => '', :maxlength=>256}
-        %input{:type => 'submit', :name => 'submit', :value => 'I want it.'}
 
     = yield
     .clear{:style => 'clear: both'}
