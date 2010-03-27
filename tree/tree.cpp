@@ -24,8 +24,8 @@ void do_each_strongly_connected_from(string child, void *data)
   it = id_map.find(child);
 
   if (it != id_map.end()) {
-    int child_id = it->second;
-    if (child_id != -1 && child_id < *minimum_id) {
+    map<string, int>::size_type child_id = it->second;
+    if (child_id != 0 && child_id < *minimum_id) {
       *minimum_id = child_id;
     }
   }
@@ -42,8 +42,8 @@ int each_strongly_connected_component_from(string node)
   vector<string>::size_type stack_length = stack.size();
   map<string, int>::size_type minimum_id, node_id;
 
-  minimum_id = node_id = id_map.size();
-  id_map.insert(pair<string, int>(node, id_map.size()));
+  minimum_id = node_id = id_map.size()+1;
+  id_map.insert(pair<string, int>(node, node_id));
   stack.push_back(node);
 
   (*for_each_child)(node, do_each_strongly_connected_from, &minimum_id);
@@ -56,12 +56,12 @@ int each_strongly_connected_component_from(string node)
     vector<string> component;
     while (it != stack.end()) {
       component.push_back(*it);
-      id_map[*it] = -1;
+      id_map[*it] = 0;
       *it++;
     }
     (*for_each_result)(component);
 
-    int n = 0;
+    vector<string>::size_type n = 0;
     for (; n < component_size; n++) { stack.pop_back(); }
   }
 
