@@ -55,7 +55,9 @@ int each_strongly_connected_component_from(string node)
 
     vector<string> component;
     while (it != stack.end()) {
-      component.push_back(*it++);
+      component.push_back(*it);
+      id_map[*it] = -1;
+      *it++;
     }
     (*for_each_result)(component);
 
@@ -83,7 +85,9 @@ void each_strongly_connected_component(each_node_cb for_each_node, each_child_cb
   stack.clear();
 
   for_each_node(do_each_strongly_connected_component);
-  return;
+
+  id_map.clear();
+  stack.clear();
 }
 
 /***********************************
