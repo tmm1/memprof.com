@@ -1,4 +1,4 @@
 %ul
   - dumps.each do |dump|
     %li
-      %a{:href => "/dump/#{dump['_id']}"}= "#{dump['name']} by #{dump['user']['email']}"
+      %a{:href => "/dump/#{dump['_id']}"}= "#{dump['name']} by #{dump['user']['email']} at #{dump['created_at']}"
