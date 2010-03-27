@@ -17,6 +17,8 @@
         - get_dumps().each do |dump|
           %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
       %span.sep= "|"
+      %a{:href => '/howto'} howto
+      %span.sep= "|"
       %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
       %span.sep= "|"
       %a{:href => 'mailto:gc@memprof.com'} contact us

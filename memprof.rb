@@ -100,8 +100,8 @@ class MemprofApp < Sinatra::Base
     redirect '/dumps'
   end
 
-  get '/signup' do
-    haml :main
+  get '/howto' do
+    partial :_howto, :layout => :newui
   end
 
   post '/email' do

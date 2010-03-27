@@ -1,0 +1,11 @@
+%h2 First
+%pre= "gem install memprof"
+
+%h2 Then, in your application to be profiled
+%pre= "require 'memprof/signal'"
+
+%h2 Finally
+%pre&= "~$ memprof --pid <pid> --name <dump name> --key <api key>"
+
+%h2 Voila
+%pre= "Memprof Uploader\nhttp://www.memprof.com\n======================\nSignaled process 63826 with SIGINFO\nWaiting 5 seconds for process 63826 to create a new dump...\n\nFound file /tmp/memprof-63826-1269721162.json\nCompressing with gzip...\n\nUploading to memprof.com...\nResponse from server:\n\"Success! Visit http://www.memprof.com/dump/4bae684b74a21dfab5000001 to view.\"\n\nDeleted dump file.\nFinished!"
