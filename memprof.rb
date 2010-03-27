@@ -97,7 +97,7 @@ class MemprofApp < Sinatra::Base
   end
 
   get %r'/(demo|panel)?$' do
-    redirect '/dump/stdlib'
+    redirect '/dumps'
   end
 
   get '/signup' do
