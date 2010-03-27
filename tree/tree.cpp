@@ -7,8 +7,8 @@ using namespace std;
 
 #include "tree.h"
 
-map<string, int> id_map;
-vector<string> stack;
+map<string, int> *id_map;
+vector<string> *stack;
 int sub_minimum_id;
 each_child_cb for_each_child;
 each_result_cb for_each_result;
@@ -21,9 +21,9 @@ void do_each_strongly_connected_from(string child, void *data)
   map<string, int>::iterator it;
   map<string, int>::size_type sub_minimum_id;
 
-  it = id_map.find(child);
+  it = id_map->find(child);
 
-  if (it != id_map.end()) {
+  if (it != id_map->end()) {
     map<string, int>::size_type child_id = it->second;
     if (child_id != 0 && child_id < *minimum_id) {
       *minimum_id = child_id;
@@ -39,30 +39,30 @@ void do_each_strongly_connected_from(string child, void *data)
 
 int each_strongly_connected_component_from(string node)
 {
-  vector<string>::size_type stack_length = stack.size();
+  vector<string>::size_type stack_length = stack->size();
   map<string, int>::size_type minimum_id, node_id;
 
-  minimum_id = node_id = id_map.size()+1;
-  id_map.insert(pair<string, int>(node, node_id));
-  stack.push_back(node);
+  minimum_id = node_id = id_map->size()+1;
+  id_map->insert(pair<string, int>(node, node_id));
+  stack->push_back(node);
 
   (*for_each_child)(node, do_each_strongly_connected_from, &minimum_id);
 
   if (node_id == minimum_id) {
-    vector<string>::size_type component_size = stack.size() - stack_length;
-    vector<string>::iterator it = stack.end();
+    vector<string>::size_type component_size = stack->size() - stack_length;
+    vector<string>::iterator it = stack->end();
     it -= component_size;
 
     vector<string> component;
-    while (it != stack.end()) {
+    while (it != stack->end()) {
       component.push_back(*it);
-      id_map[*it] = 0;
+      (*id_map)[*it] = 0;
       *it++;
     }
     (*for_each_result)(component);
 
     vector<string>::size_type n = 0;
-    for (; n < component_size; n++) { stack.pop_back(); }
+    for (; n < component_size; n++) { stack->pop_back(); }
   }
 
   return minimum_id;
@@ -72,7 +72,7 @@ void each_strongly_connected_component(each_node_cb, each_child_cb, each_result_
 
 void do_each_strongly_connected_component(string node)
 {
-  if (id_map.find(node) == id_map.end()) {
+  if (id_map->find(node) == id_map->end()) {
     each_strongly_connected_component_from(node);
   }
 }
@@ -81,13 +81,14 @@ void each_strongly_connected_component(each_node_cb for_each_node, each_child_cb
 {
   for_each_child = each_child;
   for_each_result = each_result;
-  id_map.clear();
-  stack.clear();
+
+  id_map = new map<string, int>();
+  stack = new vector<string>();
 
   for_each_node(do_each_strongly_connected_component);
 
-  id_map.clear();
-  stack.clear();
+  delete id_map;
+  delete stack;
 }
 
 /***********************************
