@@ -83,10 +83,6 @@ class MemprofApp < Sinatra::Base
     }
   end
 
-  get '/dumps' do
-    partial :_dumps, :layout => :newui
-  end
-
   get '/dump/:dump/?:view?' do
     @dump = Memprof::Dump.new(params[:dump])
     @db = @dump.db
@@ -97,7 +93,7 @@ class MemprofApp < Sinatra::Base
   end
 
   get %r'/(demo|panel)?$' do
-    redirect '/dumps'
+    partial :_home, :layout => :newui
   end
 
   get '/howto' do
