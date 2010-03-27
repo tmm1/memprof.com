@@ -45,8 +45,9 @@ if true # !File.exists?(refs_file)
   out.close
 end
 
-system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename} --file #{file}")
+system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}")
 system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}")
+system("mongo localhost/memprof_datasets --eval 'db.#{basename}_groups.drop()'")
 
 require 'memprof.com'
 dump = Memprof::Dump.new(basename)
