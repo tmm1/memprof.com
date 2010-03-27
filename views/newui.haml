@@ -1,7 +1,7 @@
 !!!
 %html
   %head
-    %title memprof.com demo: ruby stdlib
+    %title memprof.com: the ruby memory analyzer
     %link{:rel => 'icon', :href => '/favicon.png'}/
     %link{:rel => 'stylesheet', :href => '/demo/screen.css'}/
     %link{:rel => 'stylesheet', :href => '/demo/jquery.treeview.css'}/
@@ -12,11 +12,12 @@
     #menubar
       %b
         %a{:href => '/'} memprof.com
-      %span.sep= "|"
-      %span= "Dump:"
-      %select.collection
-        - get_dumps().each do |dump|
-          %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
+      -#
+        %span.sep= "|"
+        %span= "Dump:"
+        %select.collection
+          - get_dumps().each do |dump|
+            %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
       %span.sep= "|"
       %a{:href => '/signup', :rel => 'facebox'} signup
       %span.sep= "|"
@@ -32,6 +33,7 @@
     %script{:type => 'text/javascript', :src => '/jquery.min.js'}
     %script{:type => 'text/javascript', :src => '/demo/jquery.treeview.js'}
     %script{:type => 'text/javascript', :src => '/demo/jquery.scrollTo-1.4.2.js'}
+    %script{:type => 'text/javascript', :src => '/jquery.timeago.js'}
     %script{:type => 'text/javascript', :src => '/app.js'}
     %script{:type => 'text/javascript', :src => '/prettify.js'}
     %script{:type => 'text/javascript', :src => '/facebox/facebox.js'}

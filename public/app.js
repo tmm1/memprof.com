@@ -186,7 +186,7 @@ $('ul.nav li a:not(.popout)').live('click', function(){
   $(this).addClass('selected');
 
   var panel = $(this).parents('div.panel:first');
-  panel.nextAll().remove();
+  panel.nextAll('div.panel').remove();
   panel.find('> div.content').html('<center><img src="/demo/spinner.gif" style="margin: auto"></center>');
 
   $.ajax({
@@ -222,7 +222,7 @@ $('div.panel .content a').live('click', function(){
   link.addClass('current');
 
   var panel = $('<div class="panel additional"><center><img src="/demo/spinner.gif"></center></div>');
-  curPanel.nextAll().remove().end().after(panel);
+  curPanel.nextAll('div.panel').remove().end().after(panel);
 
   $.ajax({
     url: this.href,
@@ -255,6 +255,8 @@ $('div#menubar select.collection').live('change', function(){
 });
 
 $(function(){
+  jQuery("abbr.timeago").timeago();
+
   $(window).keydown(function(e){
     if (e.which == 37 || e.which == 39)
       return false;
