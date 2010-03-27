@@ -83,6 +83,15 @@ class MemprofApp < Sinatra::Base
     }
   end
 
+  get '/dumps' do
+    dumps = DB.collection('dumps').find.to_a
+    users = DB.collection('users').find.to_a
+
+    dumps.each {|d| d['user'] = users.find{|u| u['_id'] == d['user_id']}}
+    dumps = dumps.sort_by{|d| d['created_at']}.reverse
+    partial :_dumps, :dumps => dumps
+  end
+
   get '/dump/:dump/?:view?' do
     @dump = Memprof::Dump.new(params[:dump])
     @db = @dump.db
