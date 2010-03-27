@@ -304,4 +304,5 @@ $(function(){
   $('body').css('marginLeft', ($(window).width()/2 - width/2) + 'px');
 
   $('pre.prettyprint').prettify();
+  $('a[rel*=facebox]').facebox();
 });

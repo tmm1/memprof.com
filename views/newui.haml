@@ -7,6 +7,7 @@
     %link{:rel => 'stylesheet', :href => '/demo/jquery.treeview.css'}/
     %link{:rel => 'stylesheet', :href => '/prettify.css'}/
     %link{:rel => 'stylesheet', :href => '/app.css'}/
+    %link{:rel => 'stylesheet', :href => '/facebox/facebox.css'}/
   %body
     #menubar
       %b
@@ -17,7 +18,7 @@
         - get_dumps().each do |dump|
           %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
       %span.sep= "|"
-      %a{:href => '/howto'} howto
+      %a{:href => '/howto', :rel => 'facebox'} howto
       %span.sep= "|"
       %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} help memprof by taking our survey!
       %span.sep= "|"
@@ -36,6 +37,7 @@
     %script{:type => 'text/javascript', :src => '/demo/jquery.scrollTo-1.4.2.js'}
     %script{:type => 'text/javascript', :src => '/app.js'}
     %script{:type => 'text/javascript', :src => '/prettify.js'}
+    %script{:type => 'text/javascript', :src => '/facebox/facebox.js'}
 
     :javascript
       var _gaq = _gaq || [];

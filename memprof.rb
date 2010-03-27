@@ -84,7 +84,7 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/dumps' do
-    partial :_dumps, :dumps => get_dumps(), :layout => :newui
+    partial :_dumps, :layout => :newui
   end
 
   get '/dump/:dump/?:view?' do
@@ -101,7 +101,7 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/howto' do
-    partial :_howto, :layout => :newui
+    partial :_howto
   end
 
   post '/email' do
