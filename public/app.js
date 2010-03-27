@@ -251,7 +251,7 @@ $('div.panel ul.nav li.group select.group_key').live('change', function(){
 
 $('div#menubar select.collection').live('change', function(){
   var select = $(this);
-  window.location = '/db/' + select.val();
+  window.location = '/dump/' + select.val();
 });
 
 $(function(){

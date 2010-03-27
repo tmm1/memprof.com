@@ -84,12 +84,7 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/dumps' do
-    dumps = DB.collection('dumps').find.to_a
-    users = DB.collection('users').find.to_a
-
-    dumps.each {|d| d['user'] = users.find{|u| u['_id'] == d['user_id']}}
-    dumps = dumps.sort_by{|d| d['created_at']}.reverse
-    partial :_dumps, :dumps => dumps
+    partial :_dumps, :dumps => get_dumps()
   end
 
   get '/dump/:dump/?:view?' do
@@ -97,6 +92,7 @@ class MemprofApp < Sinatra::Base
     @db = @dump.db
     pass unless @db.count > 0
 
+    session[:dump] = params[:dump]
     render_panel(params[:view])
   end
 
@@ -449,6 +445,12 @@ class MemprofApp < Sinatra::Base
       else
         val
       end
+    end
+    def get_dumps()
+      dumps = DB.collection('dumps').find.to_a
+      users = DB.collection('users').find.to_a
+      dumps.each {|d| d['user'] = users.find{|u| u['_id'] == d['user_id']}}
+      dumps.sort_by{|d| d['created_at']}.reverse
     end
 
     include Rack::Utils
