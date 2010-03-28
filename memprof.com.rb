@@ -373,6 +373,8 @@ module Memprof
         code = gen_sexp(obj.n2, locals)
         if code.first == :cfunc
           tree << [:scope, [:block, [:args], [:call, nil, :CFUNCTION, [:array, [:lit, code[1]]]]]]
+        elsif code.first == :fbody
+          tree << code.last
         else
           tree << code
         end
@@ -572,7 +574,7 @@ module Memprof
 
       when 'ATTRASGN'
         tree << :attrasgn
-        tree << (obj.n1 == '0x1' ? [:self] : gen_sexp(obj.n1, locals))
+        tree << ((obj.n1 == '0x1' || obj.n1 == 0) ? [:self] : gen_sexp(obj.n1, locals))
         tree << obj.nd_mid
         tree << gen_sexp(obj.n3, locals)
 
