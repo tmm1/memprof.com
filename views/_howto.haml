@@ -1,14 +1,28 @@
-- if logged_in?
-  %h2= "Your API key is #{current_user['_id'].to_s}"
+.howto
+  - if logged_in?
+    %h2 Your API key is #{current_user['_id'].to_s}
 
-%h2 First
-%pre= "gem install memprof"
+  %h2 First
+  %pre $ gem install memprof
 
-%h2 Then, in your application to be profiled
-%pre= "require 'memprof/signal'"
+  %h2 Then, in your application to be profiled (as early as possible)
+  %pre require `gem which memprof/signal`
 
-%h2 Finally
-%pre&= "~$ memprof --pid <pid> --name <dump name> --key #{logged_in? ? current_user['_id'].to_s : '<api key>'}"
+  %h2 Finally
+  %pre=h "$ memprof --pid <pid> --name <dump name> --key #{logged_in? ? current_user['_id'].to_s : '<api key>'}"
 
-%h2 Voila
-%pre= "Memprof Uploader\nhttp://www.memprof.com\n======================\nSignaled process 63826 with SIGINFO\nWaiting 5 seconds for process 63826 to create a new dump...\n\nFound file /tmp/memprof-63826-1269721162.json\nCompressing with gzip...\n\nUploading to memprof.com...\nResponse from server:\n\"Success! Visit http://www.memprof.com/dump/4bae684b74a21dfab5000001 to view.\"\n\nDeleted dump file.\nFinished!"
+  %h2 Voila
+  %pre
+    :preserve
+      Memprof Uploader
+      http://www.memprof.com
+      ======================
+      Signaled process 63826 with SIGINFO
+      Waiting 5 seconds for process 63826 to create a new dump...
+
+      Found file /tmp/memprof-63826-1269721162.json
+      Compressing with gzip...
+
+      Uploading to memprof.com...
+      Response from server:
+      "Success! Visit http://www.memprof.com/dump/4bae684b to view."
