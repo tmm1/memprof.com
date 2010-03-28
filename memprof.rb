@@ -9,9 +9,7 @@ require 'sass'
 require 'yajl'
 require 'bcrypt'
 
-require 'mongo'
-CONN = Mongo::Connection.new
-DB = CONN.db('memprof_site')
+require 'db'
 
 require 'memprof.com'
 
