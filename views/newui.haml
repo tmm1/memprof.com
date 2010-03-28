@@ -40,17 +40,12 @@
     %script{:type => 'text/javascript', :src => '/prettify.js'}
     %script{:type => 'text/javascript', :src => '/app.js'}
 
-    - if session.delete(:show_signup)
-      :javascript
-        $(function(){
-          $('a:contains(signup)').click();
-        });
-
-    - if session.delete(:show_howto)
-      :javascript
-        $(function(){
-          $('a:contains(howto)').click();
-        });
+    - %w[ signup howto login ].each do |facebox|
+      - if session.delete(:"show_#{facebox}")
+        :javascript
+          $(function(){
+            $('a:contains(#{facebox})').click();
+          });
 
     :javascript
       var _gaq = _gaq || [];

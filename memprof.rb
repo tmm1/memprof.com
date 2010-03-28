@@ -148,7 +148,12 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/login' do
-    partial :_login
+    if request.xhr?
+      partial :_login
+    else
+      session[:show_login] = true
+      redirect '/'
+    end
   end
 
   post '/login' do
