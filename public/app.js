@@ -202,10 +202,16 @@ $('ul.nav li a:not(.popout)').live('click', function(){
 
       panel.replaceWith(newPanel);
 
+      var curr;
       if (link_text.match(/^group\s*by/))
-        newPanel.attr('url', hash + '\\\\CHANGE=' + escape($.trim($('select.group_key').val())));
+        curr = '\\\\CHANGE=' + escape($.trim($('select.group_key').val()));
       else
-        newPanel.attr('url', hash + '\\\\' + link.attr('href').replace(/^\/dump\/.+?\//,''));
+        curr = '\\\\' + link.attr('href').replace(/^\/dump\/.+?\//,'');
+
+      if (hash.indexOf(curr) == -1)
+        newPanel.attr('url', hash + curr);
+      else
+        newPanel.attr('url', hash);
 
       newPanel.setupPanel();
 
