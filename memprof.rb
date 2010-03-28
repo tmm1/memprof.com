@@ -196,9 +196,11 @@ class MemprofApp < Sinatra::Base
         render_detail(where)
       when 'references'
         render_references(where, of)
-      else
-        subview = 'namespace'
+      when 'namespace'
         render_namespace(where || of)
+      else
+        subview = 'summary'
+        return partial(:_summary, :layout => request.xhr? ? false : :newui)
       end
 
       @where, @of = where, of
