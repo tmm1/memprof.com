@@ -3,7 +3,7 @@
     %h2
       = @dump_metadata['name']
       %i= "by #{@dump_user['username']}"
-      %abbr.timeago{:title => (Time.now-3600*5).iso8601}
+      %abbr.timeago{:title => (Time.now-@dump_metadata['created_at']).iso8601}
 
     %h3
       - bin = @db.find_one(:_id=>'lsof:2')
