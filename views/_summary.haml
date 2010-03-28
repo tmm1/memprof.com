@@ -6,6 +6,39 @@
       %abbr.timeago{:title => (Time.now-3600*5).iso8601}
 
     %h3
+      - bin = @db.find_one(:_id=>'lsof:2')
+      %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
+    %ul.list
+      %li
+        - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
+        - desc = @db.find_one(:_id => ruby)
+        %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
+      - if config = @db.find_one(:type=>'module',:name=>'Config')
+        %li
+          - vars = @db.find_one(:_id => config['ivars'].find{ |k,v| k =~ /CONFIG/ }.last)
+          - keys = @db.distinct(:_id, :type=>'string',:data=>'CFLAGS')
+          - cflags = @db.find_one(:_id => vars['data'].find{ |k,v| keys.include?(k) }.last)
+          - cflags = @db.find_one(:_id => cflags['shared']) if cflags['shared']
+          compiled with
+          %a{:href => url_for('detail', :_id => vars['_id'])}= cflags['data']
+      - if ps = @db.find_one(:type=>'ps')
+        %li
+          memory usage is
+          %a{:href => url_for('detail', :type=>'ps')} #{ps['rss']} bytes
+      - if cwd = @db.find_one(:type=>'lsof',:fd=>'cwd')
+        %li
+          working directory is
+          %a{:href => url_for('detail', :type=>'lsof',:fd=>'cwd')} #{cwd['fd_name'].split('/').last(3).join('/')}
+      %li
+        %a{:href => url_for('detail', :type=>'file')} #{@db.find(:type=>'file').count} IO objects
+        and
+        - fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/)
+        %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} file descriptors
+      %li
+        - libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/)
+        %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries
+
+    %h3
       %a{:href => url_for('detail', {})} #{@db.count} objects
     %ul.list
       %li
@@ -112,30 +145,7 @@
       %li
         %a{:href => url_for('detail', :class_name=>'Thread',:main=>true)} main thread
         has #{@db.find_one(:class_name=>'Thread',:main=>true)['variables'].size rescue 0} thread variables
-
-    %h3
-      %a{:href => url_for('detail', :type=>'frame')} #{@db.find(:type=>'frame').count} stack frames
-    %ul.list
+      %li
+        %a{:href => url_for('detail', :type=>'frame')} #{@db.find(:type=>'frame').count} stack frames
       %li
         %a{:href => url_for('detail', :type=>'scope')} #{@db.find(:type=>'scope').count} scopes
-
-    %h3
-      %a{:href => url_for('detail', :type=>'file')} #{@db.find(:type=>'file').count} open files
-    %ul.list
-      %li
-        - fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/)
-        %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} process file descriptors
-
-    %h3
-      - libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/)
-      %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries linked
-    %ul.list
-      - if cwd = @db.find_one(:type=>'lsof',:fd=>'cwd')
-        %li
-          current working directory is
-          %a{:href => url_for('detail', :type=>'lsof',:fd=>'cwd')} #{cwd['fd_name'].split('/').last(3).join('/')}
-      - if bin = @db.find_one(:_id=>'lsof:2')
-        %li
-          binary location is
-          %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
-
