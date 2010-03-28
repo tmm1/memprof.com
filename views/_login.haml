@@ -1,17 +1,10 @@
 %script{:type => 'text/javascript', :src => '/jquery.min.js'}
 %script{:type => 'text/javascript', :src => '/jquery.form.js'}
 
-%h2 memprof.com is currently in a free beta
+%h2 Login
 
-%p To sign up, please complete this form!
-
-%form#signup{:action => '/signup', :method => 'POST'}
+%form#login{:action => '/login', :method => 'POST'}
   %table
-    %tr
-      %td
-        %span= "Name:"
-      %td
-        %input{:type => 'text', :name => 'name', :value => params[:name] || '', :maxlength=>256}
     %tr
       %td
         %span= "Email:"
@@ -24,18 +17,13 @@
         %input{:type => 'password', :name => 'password', :value => ''}
     %tr
       %td
-        %span= "Password confirmation:"
       %td
-        %input{:type => 'password', :name => 'password_confirmation', :value => ''}
-    %tr
-      %td
-      %td
-        %input{:type => 'submit', :name => 'submit', :value => 'Sign up'}
+        %input{:type => 'submit', :name => 'submit', :value => 'Login'}
 
 %h3 DURING THE FREE BETA, ALL UPLOADED DUMPS ARE PUBLICLY ACCESSIBLE. DO NOT UPLOAD DUMPS FROM APPLICATIONS CONTAINING SENSITIVE DATA!
 
 :javascript
-  $("#signup").submit(function() {
+  $("#login").submit(function() {
     $(this).ajaxSubmit({
       success: function(responseText, statusText) {
         alert(responseText);

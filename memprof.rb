@@ -7,6 +7,7 @@ require 'sinatra/async'
 require 'haml'
 require 'sass'
 require 'yajl'
+require 'bcrypt'
 
 require 'mongo'
 CONN = Mongo::Connection.new
@@ -108,22 +109,59 @@ class MemprofApp < Sinatra::Base
     partial :_signup
   end
 
-  post '/email' do
-    DB.collection('emails').insert(
-      :email => params[:email_addr],
-      :time => Time.now,
-      :ip => request.ip
-    )
-    haml :thanks
+  post '/signup' do
+    unless params[:name].any?
+      throw(:halt, [500, "You need a name, bro."])
+    end
+    unless params[:email].any? && params[:email].include?("@")
+      throw(:halt, [500, "You need valid email, bro."])
+    end
+    unless params[:password].length > 5
+      throw(:halt, [500, "Password must be longer than 5 characters."])
+    end
+    unless params[:password] == params[:password_confirmation]
+      throw(:halt, [500, "Password does not match the confirmation."])
+    end
+    if user = DB.collection('users').find_one(:email => params[:email])
+      throw(:halt, [500, "You're already signed up with that email, bro."])
+    end
+
+    DB.collection('users').insert({
+      :name       => params[:name],
+      :email      => params[:email],
+      :password   => BCrypt::Password.create(params[:password]).to_s,
+      :created_at => Time.now,
+      :ip         => request.ip,
+      :dumps      => []
+    })
+    "Signup successful! Please login to proceed."
   end
 
-  get '/beta' do
-    session[:beta] = true
-    redirect '/'
+  get '/login' do
+    partial :_login
+  end
+
+  post '/login' do
+    user = DB.collection('users').find_one(:email => params[:email])
+
+    unless user
+      throw(:halt, [500, "Invalid email address."])
+    end
+
+    db_pass = BCrypt::Password.new(user['password'])
+
+    # BCrypt::Password defines == to do its special decryption
+    # or whatever, so it must be the left 'operand'
+    unless db_pass == params[:password]
+      throw(:halt, [500, "Invalid password."])
+    end
+
+    session[:user_id] = user['_id'].to_s
+    "Logged in successfully!"
   end
 
   get '/logout' do
-    session.delete(:beta)
+    session.delete(:user_id)
     redirect '/'
   end
 
@@ -455,6 +493,12 @@ class MemprofApp < Sinatra::Base
       users = Hash[ *DB.collection('users').find.map{ |u| [u['_id'], u] }.flatten(1) ]
       dumps.each{ |d| d['user'] = users[d['user_id']] }
       dumps
+    end
+    def logged_in?
+      session[:user_id]
+    end
+    def current_user
+      logged_in? && DB.collection('users').find_one(:_id => Mongo::ObjectID.from_string(session[:user_id])) rescue nil
     end
 
     include Rack::Utils

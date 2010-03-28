@@ -19,13 +19,20 @@
           - get_dumps().each do |dump|
             %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
       %span.sep= "|"
-      %a{:href => '/signup', :rel => 'facebox'} signup
+      - if logged_in?
+        %a{:href => '/logout'} logout
+      - else
+        %a{:href => '/signup', :rel => 'facebox'} signup
+        %span.sep= "|"
+        %a{:href => '/login', :rel => 'facebox'} login
       %span.sep= "|"
       %a{:href => '/pricing', :rel => 'facebox'} pricing
       %span.sep= "|"
       %a{:href => '/howto', :rel => 'facebox'} howto
       %span.sep= "|"
       %a{:href => 'mailto:gc@memprof.com'} contact us
+      %span.sep= "|"
+      %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} take our survey!
 
     = yield
     .clear{:style => 'clear: both'}
