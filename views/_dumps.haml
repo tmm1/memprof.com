@@ -1,5 +1,5 @@
 %ul.dumps_list
   - get_dumps().each do |dump|
     %li
-      %a{:href => "/dump/#{dump['_id']}"}= "#{dump['name']} by #{dump['user']['email'].sub(/@.*/, '')}"
+      %a{:href => "/dump/#{dump['_id']}"}= "#{dump['name']} by #{dump['user']['username']}"
       %abbr.timeago{:title => dump['created_at'].iso8601}

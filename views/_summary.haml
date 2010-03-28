@@ -1,8 +1,8 @@
 .panel.summary
   .content
     %h2
-      stdlib
-      %i by tmm1
+      = @dump_metadata['name']
+      %i= "by #{@dump_user['username']}"
       %abbr.timeago{:title => (Time.now-3600*5).iso8601}
 
     %h3
