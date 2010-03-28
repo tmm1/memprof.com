@@ -1,3 +1,5 @@
+$.facebox.settings.overlay = false;
+
 $.fn.setupTree = function() {
   return $(this).each(function(){
     var tree = $(this);
