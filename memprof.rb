@@ -464,6 +464,11 @@ class MemprofApp < Sinatra::Base
             suffix = " (#{obj.n1[1..-1]})" if obj.n1
           elsif nd_type == 'BLOCK' or nd_type == 'NEWLINE'
             suffix = " (#{obj['file'].split('/').last(2).join('/')}:#{obj['line']})"
+          elsif nd_type == 'METHOD'
+            klass = @dump.refs.find_one(:refs => obj['_id'])
+            klass = @dump.db.find_one(:_id => klass['_id']) if klass
+            name = klass['methods'].find{ |k,v| v == obj['_id'] }.first
+            suffix = " (#{name})" if name
           end
           "node:#{nd_type}#{suffix}"
         when 'varmap'

@@ -361,9 +361,6 @@ module Memprof
         tree << gen_sexp(meth['node'], locals)
 
       when 'METHOD'
-=begin
-        add_to_parse_tree(self, current, node->nd_3rd, locals);
-=end
         klass = @refs.find_one(:refs => obj['_id'])
         klass = @db.find_one(:_id => klass['_id']) if klass
         name = klass['methods'].find{ |k,v| v == obj['_id'] }.first
