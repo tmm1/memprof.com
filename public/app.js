@@ -191,7 +191,7 @@ $('ul.nav li a:not(.popout)').live('click', function(){
 
   var panel = $(this).parents('div.panel:first');
   panel.nextAll('div.panel').remove();
-  panel.find('> div.content').html('<center><img src="/demo/spinner.gif" style="margin: auto"></center>');
+  panel.find('> div.content').html('<center><img src="/demo/spinner.gif" class="spinner"></center>');
 
   $.ajax({
     url: this.href,
@@ -225,7 +225,7 @@ $('div.panel .content a').live('click', function(){
   curPanel.find('a.current').removeClass('current');
   link.addClass('current');
 
-  var panel = $('<div class="panel additional"><center><img src="/demo/spinner.gif"></center></div>');
+  var panel = $('<div class="panel additional"><center><img src="/demo/spinner.gif" class="spinner"></center></div>');
   curPanel.nextAll('div.panel').remove().end().after(panel);
 
   $.ajax({
