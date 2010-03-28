@@ -1,5 +1,5 @@
 %table.info
-  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses n1 n2 n3 nd_body nd_var nd_cref ]
+  - exclude = %w[ code node_code super_name class_name name ivars methods variables hasSubclasses n1 n2 n3 nd_body nd_var nd_cref time ]
   - obj.each do |key,val|
     - next if key == 'line' and val == 0
     - next if key == 'super' and val == false
