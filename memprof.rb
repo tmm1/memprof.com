@@ -212,6 +212,25 @@ class MemprofApp < Sinatra::Base
     render_panel(params[:view])
   end
 
+  post '/delete_dump/:dump' do
+    throw(:halt, [404, "Not found."]) unless logged_in? && current_user['admin']
+
+    dump = DUMPS.find_one(:_id => Mongo::ObjectID.from_string(params[:dump])) rescue nil
+    throw(:halt, [404, "Can't find this dump bro."]) unless dump
+
+    DUMPS.remove(:_id => dump['_id'])
+
+    if user = USERS.find_one(:_id => dump['user_id'])
+      user['dumps'].delete(dump['_id'])
+      USERS.save(user)
+    end
+
+    datasets = CONN.db("memprof_datasets")
+    datasets.collection(dump['_id'].to_s).drop
+    datasets.collection(dump['_id'].to_s + '_refs').drop
+    redirect "/"
+  end
+
   helpers do
     def url_for(subview, where=nil, of=nil)
       url = "/dump/#{@dump.name}/#{subview}"
