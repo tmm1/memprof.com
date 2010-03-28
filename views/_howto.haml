@@ -1,11 +1,8 @@
 .howto
-  - if logged_in?
-    %h2 Your API key is #{current_user['api_key']}
-
   %h2 First
   %pre $ gem install memprof
 
-  %h2 Then, in your application to be profiled (as early as possible)
+  %h2 Then, in your application to be profiled (before anything else)
   %pre require `gem which memprof/signal`
 
   %h2 Finally
@@ -26,3 +23,6 @@
       Uploading to memprof.com...
       Response from server:
       "Success! Visit http://www.memprof.com/dump/4bae684b to view."
+
+  - if logged_in?
+    %h2.api_key.centered Your API key is #{current_user['api_key']}
