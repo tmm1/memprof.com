@@ -84,7 +84,12 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/howto' do
-    partial :_howto
+    if request.xhr?
+      partial :_howto
+    else
+      session[:show_howto] = true
+      redirect '/'
+    end
   end
 
   get '/pricing' do
@@ -92,11 +97,21 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/contact' do
-    partial :_contact
+    if request.xhr?
+      partial :_contact
+    else
+      session[:show_contact] = true
+      redirect '/'
+    end
   end
 
   get '/faq' do
-    partial :_faq
+    if request.xhr?
+      partial :_faq
+    else
+      session[:show_faq] = true
+      redirect '/'
+    end
   end
 
   get '/signup' do

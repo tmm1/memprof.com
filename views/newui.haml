@@ -40,7 +40,7 @@
     %script{:type => 'text/javascript', :src => '/prettify.js'}
     %script{:type => 'text/javascript', :src => '/app.js'}
 
-    - %w[ signup howto login ].each do |facebox|
+    - %w[ signup howto login contact faq ].each do |facebox|
       - if session.delete(:"show_#{facebox}")
         :javascript
           $(function(){
