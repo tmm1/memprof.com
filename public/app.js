@@ -25,7 +25,7 @@ $.fn.setupTree = function() {
             sublist.animate({height: '0'}, 'fast', function(){
               var panel = $this.parents('div.panel:first');
               var hash = panel.attr('url') || '';
-              panel.attr('url', hash + '//TOGGLE=' + url.replace(/^\/dump\/.+?\//,''));
+              panel.attr('url', hash + '\\\\TOGGLE=' + url.replace(/^\/dump\/.+?\//,''));
               updateHash();
               replayNext(panel);
 
@@ -102,7 +102,7 @@ var updateHash = function(){
     hash += ($(this).attr('url') || '');
     var current = $(this).find('a.current');
     if (current.length > 0)
-      hash += ('//' + current.attr('href').replace(/^\/dump\/.+?\//,''));
+      hash += ('\\\\' + current.attr('href').replace(/^\/dump\/.+?\//,''));
   });
 
   if (hash)
@@ -199,9 +199,9 @@ $('ul.nav li a:not(.popout)').live('click', function(){
       panel.replaceWith(newPanel);
 
       if (link_text.match(/^group\s*by/))
-        newPanel.attr('url', hash + '//CHANGE=' + escape($.trim($('select.group_key').val())));
+        newPanel.attr('url', hash + '\\\\CHANGE=' + escape($.trim($('select.group_key').val())));
       else
-        newPanel.attr('url', hash + '//' + link.attr('href').replace(/^\/dump\/.+?\//,''));
+        newPanel.attr('url', hash + '\\\\' + link.attr('href').replace(/^\/dump\/.+?\//,''));
 
       newPanel.setupPanel();
 
@@ -289,7 +289,7 @@ $(function(){
     }
   });
 
-  REPLAY = window.location.hash.split('//').slice(1);
+  REPLAY = window.location.hash.split('\\\\').slice(1);
   if (REPLAY.length > 0) {
     var old = REPLAY;
     REPLAY = [];
