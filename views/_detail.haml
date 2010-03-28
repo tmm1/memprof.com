@@ -124,7 +124,7 @@
 
   - if %w[ hash varmap ].include?(obj['type']) and list = obj['data'] and list.any?
     %tr.spacer.hash_data
-    - list.sort_by{|k,v| k}.first(50).each do |key,val|
+    - list.sort_by{|k,v| k}.first(200).each do |key,val|
       %tr
         %td.key= show_val key
         %td.val= show_val val
