@@ -1,6 +1,6 @@
 .howto
   - if logged_in?
-    %h2 Your API key is #{current_user['_id'].to_s}
+    %h2 Your API key is #{current_user['api_key']}
 
   %h2 First
   %pre $ gem install memprof
@@ -9,7 +9,7 @@
   %pre require `gem which memprof/signal`
 
   %h2 Finally
-  %pre=h "$ memprof --pid <pid> --name <dump name> --key #{logged_in? ? current_user['_id'].to_s : '<api key>'}"
+  %pre=h "$ memprof --pid <pid> --name <dump name> --key #{logged_in? ? current_user['api_key'] : '<api key>'}"
 
   %h2 Voilà
   %pre

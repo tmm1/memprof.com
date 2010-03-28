@@ -8,6 +8,7 @@ require 'haml'
 require 'sass'
 require 'yajl'
 require 'bcrypt'
+require 'securerandom'
 
 require 'db'
 
@@ -21,11 +22,7 @@ class MemprofApp < Sinatra::Base
     name   = params["name"]
     key    = params["key"]
 
-    user = begin
-      DB.collection('users').find_one(:_id => Mongo::ObjectID.from_string(key))
-    rescue Mongo::InvalidObjectID
-      nil
-    end
+    user = DB.collection('users').find_one(:api_key => key)
 
     unless user
       body "Bad API key."
@@ -136,7 +133,8 @@ class MemprofApp < Sinatra::Base
       :password   => BCrypt::Password.create(params[:password]).to_s,
       :created_at => Time.now,
       :ip         => request.ip,
-      :dumps      => []
+      :dumps      => [],
+      :api_key    => SecureRandom.hex(8)
     })
     "Signup successful! Please login to proceed."
   end
