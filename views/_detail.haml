@@ -119,7 +119,7 @@
     %tr.spacer.variables
     - list.each do |key,val|
       %tr
-        %td.key= show_val key
+        %td.key= key =~ /^:/ ? key[1..-1] : show_val(key)
         %td.val= show_val val
 
   - if %w[ hash varmap ].include?(obj['type']) and list = obj['data'] and list.any?
