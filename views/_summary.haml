@@ -68,7 +68,10 @@
         %a{:href => url_for('group:class', :class=>{:$exists=>true})} instances per class
 
     %h3
-      %a{:href => url_for('group:file')} #{@db.distinct(:file).size} source files
+      - unless files = @dump_metadata['files']
+        - files = @db.distinct(:file).compact
+        - DUMPS.update({:_id => @dump_metadata['_id']}, :$set => {:files => files})
+      %a{:href => url_for('group:file')} #{files.size} source files
     %ul.list
       %li
         %a{:href => url_for('detail', :file=>'(eval)')} #{@db.find(:file=>'(eval)').count} objects created inside eval
