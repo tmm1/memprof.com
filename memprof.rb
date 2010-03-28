@@ -181,6 +181,7 @@ class MemprofApp < Sinatra::Base
     def render_panel(subview=nil)
       where = (params[:where] && !params[:where].empty? ? Yajl.load(params[:where]) : nil)
       where.delete("$where") if where
+      where['_id'] = ObjectID(where.delete('_id')['$oid']) if where and where['_id'].is_a?(Hash) and where['_id'].has_key?('$oid')
 
       of = (params[:of] && !params[:of].empty? ? Yajl.load(params[:of]) : nil)
       of.delete("$where") if of
