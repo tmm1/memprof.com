@@ -22,7 +22,7 @@ class MemprofApp < Sinatra::Base
     name   = params["name"]
     key    = params["key"]
 
-    user = DB.collection('users').find_one(:api_key => key)
+    user = USERS.find_one(:api_key => key)
 
     unless user
       body "Bad API key."
@@ -44,7 +44,7 @@ class MemprofApp < Sinatra::Base
 
     # we need the dump id to use it as the collection name for the dump import.
     # we'll delete it if the import fails for some reason.
-    dump_id = DB.collection('dumps').insert(
+    dump_id = DUMPS.insert(
       :name => name,
       :user_id => user['_id'],
       :created_at => Time.now
@@ -60,11 +60,11 @@ class MemprofApp < Sinatra::Base
         EM.system("ruby import_json.rb #{basename}.json") {|o2, s2|
           if s2.exitstatus == 0
             (user['dumps'] ||= []) << dump_id
-            DB.collection('users').save(user)
+            USERS.save(user)
             body "Success! Visit http://www.memprof.com/dump/#{dump_id.to_s} to view."
           else
             # make sure we remove the dump if it failed
-            DB.collection('dumps').remove(:_id => dump_id)
+            DUMPS.remove(:_id => dump_id)
             body "Failed to import your file!"
           end
           File.delete("#{basename}.json") if File.exists?("#{basename}.json")
@@ -72,7 +72,7 @@ class MemprofApp < Sinatra::Base
         }
       else
         # make sure we remove the dump if it failed
-        DB.collection('dumps').remove(:_id => dump_id)
+        DUMPS.remove(:_id => dump_id)
         File.delete("#{basename}.json.gz") if File.exist?("#{basename}.json.gz")
         body "Failed to decompress your file!"
       end
@@ -119,14 +119,14 @@ class MemprofApp < Sinatra::Base
     unless params[:password] == params[:password_confirmation]
       throw(:halt, [500, "Password does not match the confirmation."])
     end
-    if user = DB.collection('users').find_one(:email => params[:email])
+    if user = USERS.find_one(:email => params[:email])
       throw(:halt, [500, "Someone is already signed up with that email, bro."])
     end
-    if user = DB.collection('users').find_one(:username => params[:username])
+    if user = USERS.find_one(:username => params[:username])
       throw(:halt, [500, "Someone is already signed up with that username, bro."])
     end
 
-    DB.collection('users').insert({
+    USERS.insert({
       :username   => params[:username],
       :name       => params[:name],
       :email      => params[:email],
@@ -144,7 +144,7 @@ class MemprofApp < Sinatra::Base
   end
 
   post '/login' do
-    user = DB.collection('users').find_one(:email => params[:login]) || DB.collection('users').find_one(:username => params[:login])
+    user = USERS.find_one(:email => params[:login]) || USERS.find_one(:username => params[:login])
 
     unless user
       throw(:halt, [500, "Invalid login."])
@@ -519,8 +519,8 @@ class MemprofApp < Sinatra::Base
       end
     end
     def get_dumps()
-      dumps = DB.collection('dumps').find.sort([:created_at, :desc]).to_a
-      users = Hash[ *DB.collection('users').find.map{ |u| [u['_id'], u] }.flatten(1) ]
+      dumps = DUMPS.find.sort([:created_at, :desc]).to_a
+      users = Hash[ *USERS.find.map{ |u| [u['_id'], u] }.flatten(1) ]
       dumps.each{ |d| d['user'] = users[d['user_id']] }
       dumps
     end
@@ -528,7 +528,7 @@ class MemprofApp < Sinatra::Base
       session[:user_id]
     end
     def current_user
-      logged_in? && DB.collection('users').find_one(:_id => Mongo::ObjectID.from_string(session[:user_id])) rescue nil
+      logged_in? && USERS.find_one(:_id => ObjectID(session[:user_id])) rescue nil
     end
 
     include Rack::Utils
