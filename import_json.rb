@@ -47,7 +47,7 @@ end
 
 exit(1) unless system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}")
 exit(1) unless system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}")
-exit(1) unless system("mongo localhost/memprof_datasets --eval 'db[\"#{basename}\"_groups.drop()'")
+exit(1) unless system("mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'")
 
 require 'memprof.com'
 dump = Memprof::Dump.new(basename)
