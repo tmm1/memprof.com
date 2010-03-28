@@ -35,6 +35,7 @@
             group
             - if subview == 'group'
               - possible = possible_groupings_for(@where || {})
+              - possible << key unless possible.include?(key)
               - if possible.any?
                 by
                 %select.group_key
