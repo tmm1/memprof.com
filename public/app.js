@@ -53,11 +53,13 @@ $.fn.setupPanel = function(){
 
   return $(this).each(function(){
     var panel = $(this);
-    panel.find('ul').not('ul.nav').setupTree();
+
+    panel.find('ul').not('ul.nav, ul.list').setupTree();
     if (numPanels > 1)
       panel.addClass('additional');
 
     panel.find('pre.prettyprint').prettify();
+    panel.find("abbr.timeago").timeago();
 
     updateHash();
     replayNext(panel);
@@ -257,8 +259,6 @@ $('div#menubar select.collection').live('change', function(){
 });
 
 $(function(){
-  jQuery("abbr.timeago").timeago();
-
   $(window).keydown(function(e){
     if (e.which == 37 || e.which == 39)
       return false;
