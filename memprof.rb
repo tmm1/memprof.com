@@ -53,7 +53,7 @@ class MemprofApp < Sinatra::Base
       :created_at => Time.now
     )
 
-    basename = "dumps/#{dump_id.to_s}"
+    basename = File.expand_path("../dumps/#{dump_id.to_s}", __FILE__)
 
     tempfile.close
     File.rename(tempfile.path, "#{basename}.json.gz")
@@ -70,8 +70,8 @@ class MemprofApp < Sinatra::Base
             DB.collection('dumps').remove(:_id => dump_id)
             body "Failed to import your file!"
           end
-          File.delete("#{basename}.json") if File.exist?("#{basename}.json")
-          File.delete("#{basename}_refs.json") if File.exist?("#{basename}_refs.json")
+          File.delete("#{basename}.json") if File.exists?("#{basename}.json")
+          File.delete("#{basename}_refs.json") if File.exists?("#{basename}_refs.json")
         }
       else
         # make sure we remove the dump if it failed
@@ -82,17 +82,8 @@ class MemprofApp < Sinatra::Base
     }
   end
 
-  get '/dump/:dump/?:view?' do
-    @dump = Memprof::Dump.new(params[:dump])
-    @db = @dump.db
-    pass unless @db.count > 0
-
-    session[:dump] = params[:dump]
-    render_panel(params[:view])
-  end
-
   get %r'/(demo|panel)?$' do
-    partial :_home, :layout => :newui
+    haml :_home, :layout => :newui
   end
 
   get '/howto' do
@@ -174,6 +165,15 @@ class MemprofApp < Sinatra::Base
   get '/app.css' do
     content_type('text/css')
     sass :app
+  end
+
+  get '/dump/:dump/?:view?' do
+    @dump = Memprof::Dump.new(params[:dump])
+    @db = @dump.db
+    pass unless @db.count > 0
+
+    session[:dump] = params[:dump]
+    render_panel(params[:view])
   end
 
   helpers do
