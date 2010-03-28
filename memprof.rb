@@ -177,8 +177,8 @@ class MemprofApp < Sinatra::Base
     @db = @dump.db
     pass unless @db.count > 0
 
-    @dump_metadata = DB.collection('dumps').find_one(:_id => Mongo::ObjectID.from_string(params[:dump]))
-    @dump_user     = DB.collection('users').find_one(:_id => @dump_metadata['user_id'])
+    @dump_metadata = DUMPS.find_one(:_id => (ObjectID(params[:dump]) rescue params[:dump]))
+    @dump_user     = USERS.find_one(:_id => @dump_metadata['user_id'])
 
     session[:dump] = params[:dump]
     render_panel(params[:view])

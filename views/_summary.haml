@@ -2,17 +2,20 @@
   .content
     %h2
       = @dump_metadata['name']
-      %i= "by #{@dump_user['username']}"
-      %abbr.timeago{:title => (Time.now-@dump_metadata['created_at']).iso8601}
+      %i by #{@dump_user['username']}
+      %abbr.timeago{:title => @dump_metadata['created_at'].iso8601}
 
+    - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
+    - desc = @db.find_one(:_id => ruby)
     %h3
-      - bin = @db.find_one(:_id=>'lsof:2')
-      %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
-    %ul.list
-      %li
-        - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
-        - desc = @db.find_one(:_id => ruby)
+      - if bin = @db.find_one(:_id=>'lsof:2')
+        %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
+      - else
         %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
+    %ul.list
+      - if bin
+        %li
+          %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
       - if config = @db.find_one(:type=>'module',:name=>'Config')
         %li
           - vars = @db.find_one(:_id => config['ivars'].find{ |k,v| k =~ /CONFIG/ }.last)
@@ -31,12 +34,12 @@
           %a{:href => url_for('detail', :type=>'lsof',:fd=>'cwd')} #{cwd['fd_name'].split('/').last(3).join('/')}
       %li
         %a{:href => url_for('detail', :type=>'file')} #{@db.find(:type=>'file').count} IO objects
-        and
-        - fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/)
-        %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} file descriptors
-      %li
-        - libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/)
-        %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries
+        - if fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/) and fds.any?
+          and
+          %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} file descriptors
+      - if libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/) and libs.any?
+        %li
+          %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries
 
     %h3
       %a{:href => url_for('detail', {})} #{@db.count} objects
