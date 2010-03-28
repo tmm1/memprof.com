@@ -31,7 +31,7 @@
             - else
               = o[key] || '(unknown)'
           - else
-            = o[key] || '(unknown)'
+            = o[key] ? show_val(o[key]) : '(unknown)'
 
       - if possible = possible_groupings_for(w) and possible.any?
         - subkey = possible.first

@@ -451,6 +451,8 @@ class MemprofApp < Sinatra::Base
             suffix = " (#{name})" if name
           elsif nd_type == 'CONST'
             suffix = " (#{obj.n1[1..-1]})" if obj.n1
+          elsif nd_type == 'BLOCK' or nd_type == 'NEWLINE'
+            suffix = " (#{obj['file'].split('/').last(2).join('/')}:#{obj['line']})"
           end
           "node:#{nd_type}#{suffix}"
         when 'varmap'
