@@ -4,6 +4,7 @@
     - next if key == 'line' and val == 0
     - next if key == 'super' and val == false
     - unless exclude.include?(key) or (!%w[ string float ].include?(obj['type']) and key == 'data')
+      - next if key == 'fileno2' and val == obj['fileno']
       %tr
         %td.key= key == '_id' ? 'address' : key
         - if %w[ file type line node_type ].include?(key) and val
@@ -15,10 +16,10 @@
                 = val.split('/').last(4).join('/')
               - else
                 = val
-        - elsif key == 'fileno' and val
+        - elsif %w[ fileno fileno2 ].include?(key) and val
           %td.val
             - if lsof = @db.find_one(:type => 'lsof', :fd => /^#{val}[^\d]/)
-              %a{:href => url_for('detail', :_id => lsof['_id'])}= val
+              = show_val lsof
             - else
               = val
         - else

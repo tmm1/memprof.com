@@ -477,6 +477,7 @@ class MemprofApp < Sinatra::Base
         when 'lsof'
           name = obj['fd_name']
           name = name.split('/').last(3).join('/') if name =~ /^\//
+          name = name.gsub('->', ' -> ')
           "(#{obj['fd_type']}:#{obj['fd']}) #{name}"
         else
           obj['_id']
