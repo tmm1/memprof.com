@@ -1,0 +1,39 @@
+%script{:type => 'text/javascript', :src => '/facebox/facebox.js'}
+
+%h2.centered_text faq
+
+%b What is memprof?
+%p memprof is an open source Ruby gem that provides useful data about memory & performance for MRI-based Ruby VMs.
+%p
+  It uses various binary rewriting techniques to insert hooks into the running Ruby process, allowing
+  you to collect data without having to run a patched Ruby installation.
+%p
+  Currently, memprof provides data about object allocation, garbage collection,
+  and full dumps of the Ruby heap.
+
+%p A heap dump is essentially a 'snapshot' of the live objects in your Ruby process at any point in time.
+
+%b What is memprof.com?
+%p
+  memprof.com is a tool for analyzing uploaded memprof dumps of the Ruby heap.
+  It is primarily useful for finding memory leaks in Ruby applications.
+
+%p You can:
+%ul
+  %li View objects grouped by type or file of origin
+  %li View Ruby class hierarchies
+  %li View the age of a given object
+  %li Traverse object references
+  %li Examine internal object details
+  %li Lots of other cool stuff
+
+%b How much does memprof.com cost?
+%p memprof.com is free during the beta period.
+
+%b Can I get memprof.com for my business?
+%p
+  Absolutely. Please 
+  %a{:href => '/contact', :rel => 'facebox'} contact us.
+
+:javascript
+  $('a[rel*=facebox]').facebox();

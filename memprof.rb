@@ -107,6 +107,10 @@ class MemprofApp < Sinatra::Base
     partial :_contact
   end
 
+  get '/faq' do
+    partial :_faq
+  end
+
   get '/signup' do
     partial :_signup
   end
