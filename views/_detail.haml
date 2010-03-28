@@ -15,6 +15,12 @@
                 = val.split('/').last(4).join('/')
               - else
                 = val
+        - elsif key == 'fileno' and val
+          %td.val
+            - if lsof = @db.find_one(:type => 'lsof', :fd => /^#{val}[^\d]/)
+              %a{:href => url_for('detail', :_id => lsof['_id'])}= val
+            - else
+              = val
         - else
           %td.val
             - if val.is_a?(Array)

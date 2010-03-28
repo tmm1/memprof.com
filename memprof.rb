@@ -400,7 +400,7 @@ class MemprofApp < Sinatra::Base
       case val
       when nil
         'nil'
-      when OrderedHash, /^0x/, 'globals'
+      when OrderedHash, /^0x/, 'globals', /^lsof/
         if val.is_a?(OrderedHash)
           obj = val
         else
@@ -428,14 +428,14 @@ class MemprofApp < Sinatra::Base
             o['data'].dump
           end
         when 'bignum'
-          "#<Bignum length=#{obj['length']}>"
+          "#<#{obj['class_name'] || 'Bignum'} length=#{obj['length']}>"
         when 'match'
-          "#<Match:#{obj['_id']}>"
+          "#<#{obj['class_name'] || 'MatchData'}:#{obj['_id']}>"
         when 'float'
           num = obj['data']
-          "#<Float value=#{num}>"
+          "#<#{obj['class_name'] || 'Float'} value=#{num}>"
         when 'hash', 'array'
-          "#<#{obj['type'] == 'hash' ? 'Hash' : 'Array'}:#{obj['_id']} length=#{obj['length']}>"
+          "#<#{obj['class_name'] || (obj['type'] == 'hash' ? 'Hash' : 'Array')}:#{obj['_id']} length=#{obj['length']}>"
         when 'data', 'object'
           if node = obj['nd_body'] and node = @db.find_one(:_id => node) and node['file']
             suffix = " #{node['file'].split('/').last(4).join('/')}:#{node['line']}"
@@ -464,15 +464,20 @@ class MemprofApp < Sinatra::Base
           "#<Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         when 'frame'
           klass = show_val(obj['last_class'], false) if obj['last_class']
-          func = obj['last_func'] || obj['orig_func']
-          func = func ? func[1..-1] : '(unknown)'
-
-          suffix = " #{klass ? klass + "#" : nil}#{func}" if klass or func
-          "Frame:#{obj['_id']}#{suffix}"
+          if func = obj['last_func'] || obj['orig_func']
+            func = func[1..-1]
+            "#{klass ? klass + "#" : nil}#{func}".gsub(/#<MetaClass:(.+?)>#(.+)$/){ "#{$1}.#{$2}" }
+          else
+            "#<Frame:#{obj['_id']}>"
+          end
         when 'file'
-          "#<File:#{obj['_id']}>"
+          "#<#{obj['class_name'] || 'File'}:#{obj['_id']}>"
         when 'struct'
           "#<#{obj['class_name'] || 'Struct'}:#{obj['_id']}>"
+        when 'lsof'
+          name = obj['fd_name']
+          name = name.split('/').last(3).join('/') if name =~ /^\//
+          "(#{obj['fd_type']}:#{obj['fd']}) #{name}"
         else
           obj['_id']
         end
