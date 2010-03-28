@@ -9,24 +9,29 @@
   %table
     %tr
       %td
-        %span= "Name:"
+        %label{:for => 'username'}= "Username:"
       %td
-        %input{:type => 'text', :name => 'name', :value => params[:name] || '', :maxlength=>256}
+        %input{:id => 'username', :type => 'text', :name => 'username', :value => params[:username] || '', :maxlength=>256}
     %tr
       %td
-        %span= "Email:"
+        %label{:for => 'name'}= "Name:"
       %td
-        %input{:type => 'text', :name => 'email', :value => params[:email] || '', :maxlength=>256}
+        %input{:id => 'name', :type => 'text', :name => 'name', :value => params[:name] || '', :maxlength=>256}
     %tr
       %td
-        %span= "Password:"
+        %label{:for => 'email'}= "Email:"
       %td
-        %input{:type => 'password', :name => 'password', :value => ''}
+        %input{:id => 'email', :type => 'text', :name => 'email', :value => params[:email] || '', :maxlength=>256}
     %tr
       %td
-        %span= "Password confirmation:"
+        %label{:for => 'password'}= "Password:"
       %td
-        %input{:type => 'password', :name => 'password_confirmation', :value => ''}
+        %input{:id => 'password', :type => 'password', :name => 'password', :value => ''}
+    %tr
+      %td
+        %label{:for => 'password_confirmation'}= "Password confirmation:"
+      %td
+        %input{:id => 'password_confirmation', :type => 'password', :name => 'password_confirmation', :value => ''}
     %tr
       %td
       %td

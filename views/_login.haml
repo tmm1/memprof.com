@@ -7,14 +7,14 @@
   %table
     %tr
       %td
-        %span= "Email:"
+        %label{:for => 'login'} Username or Email:
       %td
-        %input{:type => 'text', :name => 'email', :value => params[:email] || '', :maxlength=>256}
+        %input{:id => 'login', :type => 'text', :name => 'login', :value => params[:login] || '', :maxlength=>256}
     %tr
       %td
-        %span= "Password:"
+        %label{:for => 'password'}= "Password:"
       %td
-        %input{:type => 'password', :name => 'password', :value => ''}
+        %input{:id => 'password', :type => 'password', :name => 'password', :value => ''}
     %tr
       %td
       %td

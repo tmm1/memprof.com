@@ -107,6 +107,9 @@ class MemprofApp < Sinatra::Base
   end
 
   post '/signup' do
+    unless params[:username].any?
+      throw(:halt, [500, "You need a username, bro."])
+    end
     unless params[:name].any?
       throw(:halt, [500, "You need a name, bro."])
     end
@@ -120,10 +123,14 @@ class MemprofApp < Sinatra::Base
       throw(:halt, [500, "Password does not match the confirmation."])
     end
     if user = DB.collection('users').find_one(:email => params[:email])
-      throw(:halt, [500, "You're already signed up with that email, bro."])
+      throw(:halt, [500, "Someone is already signed up with that email, bro."])
+    end
+    if user = DB.collection('users').find_one(:username => params[:username])
+      throw(:halt, [500, "Someone is already signed up with that username, bro."])
     end
 
     DB.collection('users').insert({
+      :username   => params[:username],
       :name       => params[:name],
       :email      => params[:email],
       :password   => BCrypt::Password.create(params[:password]).to_s,
@@ -139,10 +146,10 @@ class MemprofApp < Sinatra::Base
   end
 
   post '/login' do
-    user = DB.collection('users').find_one(:email => params[:email])
+    user = DB.collection('users').find_one(:email => params[:login]) || DB.collection('users').find_one(:username => params[:login])
 
     unless user
-      throw(:halt, [500, "Invalid email address."])
+      throw(:halt, [500, "Invalid login."])
     end
 
     db_pass = BCrypt::Password.new(user['password'])
