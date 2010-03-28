@@ -12,15 +12,9 @@
     #menubar
       %b
         %a{:href => '/'} memprof.com
-      -#
-        %span.sep= "|"
-        %span= "Dump:"
-        %select.collection
-          - get_dumps().each do |dump|
-            %option{:selected => (session[:dump] == dump['_id'].to_s), :value => dump['_id'].to_s}= dump['name']
       %span.sep= "|"
       - if logged_in?
-        %a{:href => '/logout'} logout
+        %a{:href => '/logout'} logout #{current_user['username']}
       - else
         %a{:href => '/signup', :rel => 'facebox'} signup
         or
@@ -42,8 +36,21 @@
     %script{:type => 'text/javascript', :src => '/demo/jquery.scrollTo-1.4.2.js'}
     %script{:type => 'text/javascript', :src => '/jquery.timeago.js'}
     %script{:type => 'text/javascript', :src => '/facebox/facebox.js'}
-    %script{:type => 'text/javascript', :src => '/app.js'}
+    %script{:type => 'text/javascript', :src => '/jquery.form.js'}
     %script{:type => 'text/javascript', :src => '/prettify.js'}
+    %script{:type => 'text/javascript', :src => '/app.js'}
+
+    - if session.delete(:show_signup)
+      :javascript
+        $(function(){
+          $('a:contains(signup)').click();
+        });
+
+    - if session.delete(:show_howto)
+      :javascript
+        $(function(){
+          $('a:contains(howto)').click();
+        });
 
     :javascript
       var _gaq = _gaq || [];

@@ -100,7 +100,12 @@ class MemprofApp < Sinatra::Base
   end
 
   get '/signup' do
-    partial :_signup
+    if request.xhr?
+      partial :_signup
+    else
+      session[:show_signup] = true
+      redirect '/'
+    end
   end
 
   post '/signup' do
@@ -126,7 +131,7 @@ class MemprofApp < Sinatra::Base
       throw(:halt, [500, "Someone is already signed up with that username, bro."])
     end
 
-    USERS.insert({
+    uid = USERS.insert(
       :username   => params[:username],
       :name       => params[:name],
       :email      => params[:email],
@@ -135,8 +140,11 @@ class MemprofApp < Sinatra::Base
       :ip         => request.ip,
       :dumps      => [],
       :api_key    => SecureRandom.hex(8)
-    })
-    "Signup successful! Please login to proceed."
+    )
+
+    session[:user_id] = uid.to_s
+    session[:show_howto] = true
+    "Signup successful!"
   end
 
   get '/login' do
@@ -164,7 +172,7 @@ class MemprofApp < Sinatra::Base
 
   get '/logout' do
     session.delete(:user_id)
-    redirect '/'
+    redirect request.referrer || '/'
   end
 
   get '/app.css' do
@@ -528,7 +536,7 @@ class MemprofApp < Sinatra::Base
       session[:user_id]
     end
     def current_user
-      logged_in? && USERS.find_one(:_id => ObjectID(session[:user_id])) rescue nil
+      @_current_user ||= (logged_in? && USERS.find_one(:_id => ObjectID(session[:user_id])) rescue nil)
     end
 
     include Rack::Utils

@@ -224,6 +224,18 @@ $('ul.nav li a:not(.popout)').live('click', function(){
   return false;
 });
 
+$('form#signup, form#login').live('submit', function(){
+  $(this).ajaxSubmit({
+    success: function(responseText, statusText) {
+      window.location.reload(true);
+    },
+    error: function (obj) {
+      alert(obj.responseText);
+    }
+  });
+  return false;
+});
+
 $('div.panel .content a').live('click', function(){
   var link = $(this);
   var curPanel = $(this).parents('div.panel:first');

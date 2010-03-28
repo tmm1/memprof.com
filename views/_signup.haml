@@ -1,54 +1,35 @@
-%script{:type => 'text/javascript', :src => '/jquery.min.js'}
-%script{:type => 'text/javascript', :src => '/jquery.form.js'}
+.signup
+  %form#signup{:action => '/signup', :method => 'POST'}
+    %table
+      %tr
+        %td.label
+          %label{:for => 'username'} Username
+        %td
+          %input{:id => 'username', :type => 'text', :placeholder => 'preferred username', :name => 'username', :value => params[:username] || '', :maxlength=>256}
+      %tr
+        %td.label
+          %label{:for => 'name'} Name
+        %td
+          %input{:id => 'name', :type => 'text', :name => 'name', :placeholder => 'full name', :value => params[:name] || '', :maxlength=>256}
+      %tr
+        %td.label
+          %label{:for => 'email'} Email
+        %td
+          %input{:id => 'email', :type => 'text', :name => 'email', :placeholder => 'email address', :value => params[:email] || '', :maxlength=>256}
+      %tr
+        %td.label
+          %label{:for => 'password'} Password
+        %td
+          %input{:id => 'password', :type => 'password', :placeholder => 'password (stored using bcrypt)', :name => 'password', :value => ''}
+      %tr
+        %td.label
+          %label{:for => 'password_confirmation'} Password Again
+        %td
+          %input{:id => 'password_confirmation', :type => 'password', :placeholder => 'password again', :name => 'password_confirmation', :value => ''}
+      %tr
+        %td.submit{:colspan=>2}
+          %input{:type => 'submit', :name => 'submit', :value => 'Sign up'}
 
-%h2.centered_text memprof.com is currently in a free beta
-
-%p To sign up, please complete this form!
-
-%form#signup{:action => '/signup', :method => 'POST'}
-  %table
-    %tr
-      %td
-        %label{:for => 'username'}= "Username:"
-      %td
-        %input{:id => 'username', :type => 'text', :name => 'username', :value => params[:username] || '', :maxlength=>256}
-    %tr
-      %td
-        %label{:for => 'name'}= "Name:"
-      %td
-        %input{:id => 'name', :type => 'text', :name => 'name', :value => params[:name] || '', :maxlength=>256}
-    %tr
-      %td
-        %label{:for => 'email'}= "Email:"
-      %td
-        %input{:id => 'email', :type => 'text', :name => 'email', :value => params[:email] || '', :maxlength=>256}
-    %tr
-      %td
-        %label{:for => 'password'}= "Password:"
-      %td
-        %input{:id => 'password', :type => 'password', :name => 'password', :value => ''}
-    %tr
-      %td
-        %label{:for => 'password_confirmation'}= "Password confirmation:"
-      %td
-        %input{:id => 'password_confirmation', :type => 'password', :name => 'password_confirmation', :value => ''}
-    %tr
-      %td
-      %td
-        %input{:type => 'submit', :name => 'submit', :value => 'Sign up'}
-
-%h3.centered_text DURING THE FREE BETA, ALL UPLOADED DUMPS ARE PUBLICLY ACCESSIBLE. DO NOT UPLOAD DUMPS FROM APPLICATIONS CONTAINING SENSITIVE DATA!
-
-:javascript
-  $("#signup").submit(function() {
-    $(this).ajaxSubmit({
-      success: function(responseText, statusText) {
-        alert(responseText);
-        window.location = '/';
-      },
-      error: function (obj) {
-        alert(obj.responseText);
-      }
-    });
-    return false;
-  });
+  %h3.centered_text.warning
+    DURING THE FREE BETA, ALL UPLOADED DUMPS ARE PUBLICLY ACCESSIBLE.
+    DO NOT UPLOAD DUMPS FROM APPLICATIONS CONTAINING SENSITIVE DATA!
