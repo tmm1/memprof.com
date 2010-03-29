@@ -50,7 +50,7 @@ class MemprofApp < Sinatra::Base
     tempfile.close
     File.rename(tempfile.path, "#{basename}.json.gz")
 
-    "Success!"
+    "Success! Visit http://www.memprof.com/dump/#{dump_id.to_s} to view."
   end
 
   get %r'/(demo|panel)$' do
