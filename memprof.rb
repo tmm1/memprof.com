@@ -84,7 +84,11 @@ class MemprofApp < Sinatra::Base
     }
   end
 
-  get %r'/(demo|panel)?$' do
+  get %r'/(demo|panel)$' do
+    redirect '/'
+  end
+
+  get '/' do
     haml :_home, :layout => :newui
   end
 
