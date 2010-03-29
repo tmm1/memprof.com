@@ -224,11 +224,7 @@ class MemprofApp < Sinatra::Base
     throw(:halt, [404, "Can't find this dump bro."]) unless dump
 
     DUMPS.remove(:_id => dump['_id'])
-
-    if user = USERS.find_one(:_id => dump['user_id'])
-      user['dumps'].delete(dump['_id'])
-      USERS.save(user)
-    end
+    USERS.update({:_id => dump['user_id']}, :$pull => {:dumps => dump['_id']})
 
     datasets = CONN.db("memprof_datasets")
     datasets.collection(dump['_id'].to_s).drop
