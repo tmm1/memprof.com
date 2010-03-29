@@ -34,7 +34,7 @@ if true # !File.exists?(refs_file)
     refs.delete obj['_id']
 
     if refs.any?
-      out.puts Yajl.dump :_id => obj['_id'], :refs => refs
+      out.puts Yajl.dump :_id => obj['_id'], :refs => refs, :refs_size => refs.size
     end
   }
 
