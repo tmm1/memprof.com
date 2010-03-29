@@ -47,6 +47,7 @@ sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --fi
 sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}"
 sh "mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'"
 
+puts "creating indexes"
 require 'memprof.com'
 dump = Memprof::Dump.new(basename)
 

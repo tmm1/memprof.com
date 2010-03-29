@@ -325,12 +325,12 @@ $(function(){
   var spinner = new Image();
   spinner.src = '/demo/spinner.gif';
 
-  REPLAY = window.location.hash.split('\\\\').slice(1);
+  REPLAY = unescape(window.location.hash).split('\\\\').slice(1);
   if (REPLAY.length > 0) {
     var old = REPLAY;
     REPLAY = [];
     for (key in old) {
-      REPLAY.push(unescape(old[key]));
+      REPLAY.push(old[key]);
     }
   }
 

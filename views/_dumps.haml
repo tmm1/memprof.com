@@ -1,3 +1,7 @@
+%h3.float_right
+  %a.facebox{:href => '/howto'} Upload yours now!
+
+%h3 Recent Heap Dumps
 %ul.dumps_list
   - user = current_user
   - get_dumps.each do |dump|
@@ -9,3 +13,4 @@
       %a{:href => "/dump/#{dump['_id']}"} #{dump['name']}
       %i by #{dump['user']['username']}
       %abbr.timeago{:title => dump['created_at'].iso8601}
+
