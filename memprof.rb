@@ -571,8 +571,8 @@ class MemprofApp < Sinatra::Base
         val
       end
     end
-    def get_dumps()
-      dumps = DUMPS.find.sort([:created_at, :desc]).to_a
+    def get_dumps
+      dumps = DUMPS.find(:state => 'imported').sort([:created_at, :desc]).to_a
       users = Hash[ *USERS.find.map{ |u| [u['_id'], u] }.flatten(1) ]
       dumps.each{ |d| d['user'] = users[d['user_id']] }
       dumps
