@@ -51,9 +51,11 @@ class MemprofApp < Sinatra::Base
     )
 
     basename = File.expand_path("../dumps/#{dump_id.to_s}", __FILE__)
+    storage_name = File.expand_path("../stored_dumps/#{dump_id.to_s}.json.gz", __FILE__)
 
     tempfile.close
     File.rename(tempfile.path, "#{basename}.json.gz")
+    File.copy("#{basename}.json.gz", storage_name)
 
     EM.system("gunzip -f #{basename}.json.gz") {|o1, s1|
       if s1.exitstatus == 0
@@ -65,6 +67,8 @@ class MemprofApp < Sinatra::Base
           else
             # make sure we remove the dump if it failed
             DUMPS.remove(:_id => dump_id)
+            # dont store a compressed copy if it failed
+            File.delete(storage_name)
             body "Failed to import your file!"
           end
           File.delete("#{basename}.json") if File.exists?("#{basename}.json")
@@ -74,6 +78,7 @@ class MemprofApp < Sinatra::Base
         # make sure we remove the dump if it failed
         DUMPS.remove(:_id => dump_id)
         File.delete("#{basename}.json.gz") if File.exist?("#{basename}.json.gz")
+        File.delete(storage_name)
         body "Failed to decompress your file!"
       end
     }
