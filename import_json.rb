@@ -1,7 +1,5 @@
-require 'rubygems'
-require 'bundler'
-Bundler.setup
-
+require 'setup'
+require 'rake'
 require 'yajl'
 
 raise ArgumentError, "invalid file: #{ARGV[0]}" unless ARGV[0] and File.exists?(ARGV[0])
@@ -45,15 +43,9 @@ if true # !File.exists?(refs_file)
   out.close
 end
 
-puts "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}"
-puts `mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}`
-exit(1) unless $?.exitstatus == 0
-puts "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}"
-puts `mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}`
-exit(1) unless $?.exitstatus == 0
-puts "mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'"
-puts `mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'`
-exit(1) unless $?.exitstatus == 0
+sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}"
+sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}"
+sh "mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'"
 
 require 'memprof.com'
 dump = Memprof::Dump.new(basename)

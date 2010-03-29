@@ -11,4 +11,5 @@ gem 'mongo_ext', '0.19.1'
 gem 'ruby2ruby'
 gem 'ruby_parser'
 gem 'ParseTree'
-gem "bcrypt-ruby"
+gem 'bcrypt-ruby'
+gem 'rake'
