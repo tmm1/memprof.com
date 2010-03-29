@@ -16,15 +16,15 @@
       - if logged_in?
         %a{:href => '/logout'} logout #{current_user['username']}
       - else
-        %a{:href => '/signup', :rel => 'facebox'} signup
+        %a.facebox{:href => '/signup'} signup
         or
-        %a{:href => '/login', :rel => 'facebox'} login
+        %a.facebox{:href => '/login'} login
       %span.sep= "|"
-      %a{:href => '/howto', :rel => 'facebox'} howto
+      %a.facebox{:href => '/howto'} howto
       %span.sep= "|"
-      %a{:href => '/faq', :rel => 'facebox'} faq
+      %a.facebox{:href => '/faq'} faq
       %span.sep= "|"
-      %a{:href => '/contact', :rel => 'facebox'} contact us
+      %a.facebox{:href => '/contact'} contact us
       %span.sep= "|"
       %a{:href => 'http://bit.ly/93FoX9', :target => '_blank'} take our survey!
 

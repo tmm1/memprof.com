@@ -191,6 +191,11 @@ $('ul.dumps_list li').live('mouseover mouseout', function(event){
   }
 });
 
+$('a.facebox').live('click', function(){
+  $.facebox({ajax: this.href});
+  return false;
+});
+
 $('ul.nav li a:not(.popout)').live('click', function(){
   var link = $(this);
   var nav = $(this).parents('ul.nav:first');
@@ -244,7 +249,7 @@ $('form#signup, form#login').live('submit', function(){
   return false;
 });
 
-$('div.panel .content a').live('click', function(){
+$('div.panel .content a:not(.facebox)').live('click', function(){
   var link = $(this);
   var curPanel = $(this).parents('div.panel:first');
 
@@ -334,5 +339,4 @@ $(function(){
   $('body').css('marginLeft', ($(window).width()/2 - width/2) + 'px');
 
   $('pre.prettyprint').prettify();
-  $('a[rel*=facebox]').facebox();
 });
