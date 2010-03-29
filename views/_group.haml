@@ -11,7 +11,7 @@
         %a{:href => url_for('detail', w)}
           - case key
           - when 'refs'
-            = show_val o['_id']
+            = h show_val(o['_id'], false)
           - when 'time'
             - diff = time_range.last - o[key]['$gte']
             - diff /= 1000
@@ -36,7 +36,7 @@
             - else
               = o[key] || '(unknown)'
           - else
-            = o[key] ? show_val(o[key]) : '(unknown)'
+            = h(o[key] ? show_val(o[key], false) : '(unknown)')
 
       - if key != 'refs' and possible = possible_groupings_for(w) and possible.any?
         - subkey = possible.first
