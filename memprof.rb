@@ -511,8 +511,8 @@ class MemprofApp < Sinatra::Base
           "#<Scope:#{obj['_id']}#{vars ? " variables=#{vars.join(', ')}" : nil}>"
         when 'frame'
           klass = show_val(obj['last_class'], false) if obj['last_class']
-          if func = obj['last_func'] || obj['orig_func']
-            func = func[1..-1]
+          func = obj['last_func'] || obj['orig_func']
+          if func and func = func[1..-1] and !func.empty?
             "#{klass ? klass + "#" : nil}#{func}".gsub(/#<MetaClass:(.+?)>#(.+)$/){ "#{$1}.#{$2}" }
           else
             "#<Frame:#{obj['_id']}>"
