@@ -1,19 +1,36 @@
 .panel
   .content
-    %h2 users
-    %table#users
-      %th Username
-      %th Name
-      %th Email
-      %th Dumps
-      %th User since
-      %th API key
-      - @users.each do |user|
-        %tr
-          %td= user['username']
-          %td= user['name']
-          %td= user['email']
-          %td= @dumps.select{|d| d['user_id'] == user['_id']}.size
-          %td
-            %abbr.timeago{:title => user['created_at'].iso8601}
-          %td= user['api_key']
+    .users
+      %h2.centered users
+      %table#users
+        %tr.header
+          %th Username
+          %th Name
+          %th Email
+          %th Dumps
+          %th User since
+          %th API key
+
+        - @users.each do |user|
+          %tr.spacer
+          %tr.row
+            %td= user['username']
+            %td= user['name']
+            %td= user['email']
+            %td= user['dumps'].size rescue 0
+            %td
+              %abbr.timeago{:title => user['created_at'].iso8601}
+            %td= user['api_key']
+
+          - user['dumps'].each do |dump_id|
+            - if dump = DUMPS.find_one(:_id => dump_id)
+              %tr
+                %td{:colspan=>4}
+                  %a{:href => "/dump/#{dump_id.to_s}"}= dump['name']
+                %td= dump['status']
+                %td
+                  %abbr.timeago{:title => dump['created_at'].iso8601}
+            - else
+              %tr
+                %td.centered{:colspan=>6}
+                  missing dump entry!

@@ -208,8 +208,7 @@ class MemprofApp < Sinatra::Base
   get '/users' do
     throw(:halt, [404, "Not found."]) unless admin?
 
-    @users = USERS.find()
-    @dumps = DUMPS.find()
+    @users = USERS.find.sort([:created_at, :desc])
     haml :_users, :layout => :newui
   end
 
