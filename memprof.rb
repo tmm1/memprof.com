@@ -220,7 +220,7 @@ class MemprofApp < Sinatra::Base
   post '/delete_dump/:dump' do
     throw(:halt, [404, "Not found."]) unless logged_in? && current_user['admin']
 
-    dump = DUMPS.find_one(:_id => Mongo::ObjectID.from_string(params[:dump])) rescue nil
+    dump = DUMPS.find_one(:_id => ObjectID(params[:dump])) rescue nil
     throw(:halt, [404, "Can't find this dump bro."]) unless dump
 
     DUMPS.remove(:_id => dump['_id'])
