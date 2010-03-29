@@ -59,12 +59,12 @@
             %a{:href => url_for('detail', :type=>'lsof',:fd=>'cwd')} #{cwd['fd_name'].split('/').last(3).join('/')}
         %li
           %a{:href => url_for('detail', :type=>'file')} #{@db.find(:type=>'file').count} IO objects
-          - if fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/) and fds.any?
+          - if fds = @db.find(:type=>'lsof',:fd=>/^\d/).count and fds > 0
             and
-            %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} file descriptors
-        - if libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/) and libs.any?
+            %a{:href => url_for('detail', :type=>'lsof',:fd=>/^\d/)} #{fds} file descriptors
+        - if libs = @db.find(:type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/).count and libs > 0
           %li
-            %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries
+            %a{:href => url_for('detail', :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/)} #{libs} shared libraries
 
       %h3
         %a{:href => url_for('detail', {})} #{@db.count} objects

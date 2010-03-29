@@ -7,6 +7,12 @@ def ObjectID(str)
   Mongo::ObjectID.from_string(str)
 end
 
+class Regexp
+  def to_json()
+    Yajl.dump :$regex => to_s
+  end
+end
+
 require 'sequel/extensions/pretty_table'
 
 class Mongo::Collection
