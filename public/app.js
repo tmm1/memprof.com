@@ -322,6 +322,9 @@ $(function(){
     }
   });
 
+  var spinner = new Image();
+  spinner.src = '/demo/spinner.gif';
+
   REPLAY = window.location.hash.split('\\\\').slice(1);
   if (REPLAY.length > 0) {
     var old = REPLAY;
@@ -330,7 +333,6 @@ $(function(){
       REPLAY.push(unescape(old[key]));
     }
   }
-
 
   var panel = $('div.panel')
   panel.setupPanel();
