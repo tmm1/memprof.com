@@ -130,11 +130,11 @@ var centerPanel = function(panel, to_top) {
 
   var wasCentered = false;
 
-  if (panel.hasClass('centered')) {
+  if (panel.hasClass('middle')) {
     wasCentered = true;
   } else {
-    $('div.panel.centered').removeClass('centered');
-    panel.addClass('centered');
+    $('div.panel.middle').removeClass('middle');
+    panel.addClass('middle');
   }
 
   var x = panel.position().left + panel.outerWidth()/2 - $(window).width()/2;
