@@ -1,6 +1,4 @@
-require 'rubygems'
-require 'bundler'
-Bundler.setup
+require 'setup'
 
 require 'sinatra/base'
 require 'sinatra/async'
@@ -12,7 +10,6 @@ require 'securerandom'
 require 'ftools'
 
 require 'db'
-
 require 'memprof.com'
 
 class MemprofApp < Sinatra::Base
