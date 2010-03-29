@@ -6,8 +6,8 @@
           %th Username
           %th Name
           %th Email
+          %th IP
           %th User since
-          %th API key
 
         - @users.each do |user|
           %tr.spacer
@@ -15,17 +15,19 @@
             %td= user['username']
             %td= user['name']
             %td= user['email']
-            %td
+            %td.centered= user['ip']
+            %td.centered
               %abbr.timeago{:title => user['created_at'].iso8601}
-            %td= user['api_key']
 
           - user['dumps'].each do |dump_id|
             - if dump = DUMPS.find_one(:_id => dump_id)
-              %tr
-                %td{:colspan=>3}
+              %tr.dump{:class => dump_id == user['dumps'].last && 'last'}
+                - if dump_id == user['dumps'].first
+                  %td{:rowspan=>user['dumps'].size, :style=>'border-bottom: none; border-left: none'} &nbsp;
+                %td.first{:colspan=>2}
                   %a{:href => "/dump/#{dump_id.to_s}"}= dump['name']
-                %td= dump['status']
-                %td
+                %td.centered= dump['status']
+                %td.last
                   %abbr.timeago{:title => dump['created_at'].iso8601}
             - else
               %tr
