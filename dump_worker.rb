@@ -1,5 +1,6 @@
 require 'db'
 require 'ftools'
+require 'rake'
 
 def cleanup(basename, storage_name=nil)
   File.delete(storage_name) if storage_name
@@ -17,11 +18,9 @@ def process_dump(dump)
 
   File.copy("#{basename}.json.gz", storage_name)
 
-  puts "gunzip -f #{basename}.json.gz"
-  puts `gunzip -f #{basename}.json.gz`
+  sh "gunzip -f #{basename}.json.gz"
   if $?.exitstatus == 0
-    puts "ruby import_json.rb #{basename}.json"
-    puts `ruby import_json.rb #{basename}.json`
+    sh "ruby import_json.rb #{basename}.json"
     if $?.exitstatus == 0
       DUMPS.update({:_id => dump['_id']}, :$set => {:status => 'imported'})
       cleanup(basename)
@@ -35,6 +34,7 @@ def process_dump(dump)
   end
 end
 
+puts 'starting loop'
 loop do
   if dumps = DUMPS.find(:status => 'pending')
     dumps.each {|d| process_dump(d)}
