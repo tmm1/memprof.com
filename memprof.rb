@@ -9,6 +9,7 @@ require 'sass'
 require 'yajl'
 require 'bcrypt'
 require 'securerandom'
+require 'ftools'
 
 require 'db'
 
