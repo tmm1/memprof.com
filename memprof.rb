@@ -181,10 +181,9 @@ class MemprofApp < Sinatra::Base
     pass unless @dump_metadata = DUMPS.find_one(:_id => (ObjectID(params[:dump]) rescue params[:dump]))
     @dump_user     = USERS.find_one(:_id => @dump_metadata['user_id'])
 
-    @dump = Memprof::Dump.new(@dump_metadata['_id'].to_s)
-    @db = @dump.db
-
     if @dump_metadata['status'] == 'imported'
+      @dump = Memprof::Dump.new(@dump_metadata['_id'].to_s)
+      @db = @dump.db
       render_panel(params[:view])
     else
       render_panel('summary')
