@@ -215,8 +215,11 @@ class MemprofApp < Sinatra::Base
     @dump_metadata = DUMPS.find_one(:_id => (ObjectID(params[:dump]) rescue params[:dump]))
     @dump_user     = USERS.find_one(:_id => @dump_metadata['user_id'])
 
-    session[:dump] = params[:dump]
-    render_panel(params[:view])
+    if @dump_metadata['state'] == 'imported'
+      render_panel(params[:view])
+    else
+      render_panel('summary')
+    end
   end
 
   post '/delete_dump/:dump' do

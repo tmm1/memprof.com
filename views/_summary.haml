@@ -5,153 +5,172 @@
       %i by #{@dump_user['username']}
       %abbr.timeago{:title => @dump_metadata['created_at'].iso8601}
 
-    - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
-    - desc = @db.find_one(:_id => ruby)
-    %h3
-      - if bin = @db.find_one(:_id=>'lsof:2')
-        %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
+    - unless @dump_metadata['state'] == 'imported'
+      - if @dump_metadata['state'] == 'pending'
+        %h3.centered
+          We are currently processing your heap dump.
+          %br/
+          This usually takes about 5 minutes.
+          %br/
+          %img.spinner{:src => '/demo/spinner.gif'}
+
+        %h4.centered
+          You are number #{DUMPS.find(:state => 'pending', :_id => {:$lt => @dump_metadata['_id']}).count + 1} in the queue.
       - else
-        %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
-    %ul.list
-      - if bin
-        %li
+        %h3.centered
+          Something went wrong with this heap dump.
+          %br/
+          %a.facebox{:href => '/contact'} Contact us
+          for help.
+
+    - else
+      - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
+      - desc = @db.find_one(:_id => ruby)
+      %h3
+        - if bin = @db.find_one(:_id=>'lsof:2')
+          %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
+        - else
           %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
-      - if config = @db.find_one(:type=>'module',:name=>'Config')
+      %ul.list
+        - if bin
+          %li
+            %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
+        - if config = @db.find_one(:type=>'module',:name=>'Config')
+          %li
+            - vars = @db.find_one(:_id => config['ivars'].find{ |k,v| k =~ /CONFIG/ }.last)
+            - keys = @db.distinct(:_id, :type=>'string',:data=>'CFLAGS')
+            - cflags = @db.find_one(:_id => vars['data'].find{ |k,v| keys.include?(k) }.last)
+            - cflags = @db.find_one(:_id => cflags['shared']) if cflags['shared']
+            compiled with
+            %a{:href => url_for('detail', :_id => vars['_id'])}= cflags['data']
+        - if ps = @db.find_one(:type=>'ps')
+          %li
+            memory usage is
+            %a{:href => url_for('detail', :type=>'ps')} #{ps['rss']} bytes
+        - if cwd = @db.find_one(:type=>'lsof',:fd=>'cwd')
+          %li
+            working directory is
+            %a{:href => url_for('detail', :type=>'lsof',:fd=>'cwd')} #{cwd['fd_name'].split('/').last(3).join('/')}
         %li
-          - vars = @db.find_one(:_id => config['ivars'].find{ |k,v| k =~ /CONFIG/ }.last)
-          - keys = @db.distinct(:_id, :type=>'string',:data=>'CFLAGS')
-          - cflags = @db.find_one(:_id => vars['data'].find{ |k,v| keys.include?(k) }.last)
-          - cflags = @db.find_one(:_id => cflags['shared']) if cflags['shared']
-          compiled with
-          %a{:href => url_for('detail', :_id => vars['_id'])}= cflags['data']
-      - if ps = @db.find_one(:type=>'ps')
+          %a{:href => url_for('detail', :type=>'file')} #{@db.find(:type=>'file').count} IO objects
+          - if fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/) and fds.any?
+            and
+            %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} file descriptors
+        - if libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/) and libs.any?
+          %li
+            %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries
+
+      %h3
+        %a{:href => url_for('detail', {})} #{@db.count} objects
+      %ul.list
         %li
-          memory usage is
-          %a{:href => url_for('detail', :type=>'ps')} #{ps['rss']} bytes
-      - if cwd = @db.find_one(:type=>'lsof',:fd=>'cwd')
+          %a{:href => url_for('detail', :_id => 'globals')} #{@db.find_one(:_id=>'globals')['variables'].size} global variables
         %li
-          working directory is
-          %a{:href => url_for('detail', :type=>'lsof',:fd=>'cwd')} #{cwd['fd_name'].split('/').last(3).join('/')}
-      %li
-        %a{:href => url_for('detail', :type=>'file')} #{@db.find(:type=>'file').count} IO objects
-        - if fds = @db.distinct(:_id, :type=>'lsof',:fd=>/^\d/) and fds.any?
-          and
-          %a{:href => url_for('detail', :_id=>{:$in=>fds})} #{fds.size} file descriptors
-      - if libs = @db.distinct(:_id, :type=>'lsof',:fd_name=>/\.(so|bundle|dylib)$/) and libs.any?
+          %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} #{@dump.root_object['ivars'].select{|c,v| c =~ /^[A-Z]/ }.size} constants
+          inside
+          %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} Object
         %li
-          %a{:href => url_for('detail', :_id=>{:$in=>libs})} #{libs.size} shared libraries
-
-    %h3
-      %a{:href => url_for('detail', {})} #{@db.count} objects
-    %ul.list
-      %li
-        %a{:href => url_for('detail', :_id => 'globals')} #{@db.find_one(:_id=>'globals')['variables'].size} global variables
-      %li
-        %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} #{@dump.root_object['ivars'].select{|c,v| c =~ /^[A-Z]/ }.size} constants
-        inside
-        %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} Object
-      %li
-        %a{:href => url_for('group:age')} objects by age
-      %li
-        %a{:href => url_for('group:type')} objects by type
-
-    %h3
-      %a{:href => url_for('detail', :type=>'class')} #{@db.find(:type=>'class').count} classes
-      and
-      %a{:href => url_for('detail', :type=>'module')} #{@db.find(:type=>'module').count} modules
-    %ul.list
-      %li
-        %a{:href => url_for('namespace')} namespace hierarchy
-      %li
-        %a{:href => url_for('subclasses')} class hierarchy
-      %li
-        %a{:href => url_for('group:class', :class=>{:$exists=>true})} instances per class
-
-    %h3
-      - unless files = @dump_metadata['files']
-        - files = @db.distinct(:file).compact
-        - DUMPS.update({:_id => @dump_metadata['_id']}, :$set => {:files => files})
-      %a{:href => url_for('group:file')} #{files.size} source files
-    %ul.list
-      %li
-        %a{:href => url_for('detail', :file=>'(eval)')} #{@db.find(:file=>'(eval)').count} objects created inside eval
-      %li
-        %a{:href => url_for('detail', :file=>{:$exists=>false})} #{@db.find(:file=>{:$exists=>false}).count} objects missing file information
-
-    %h3
-      %a{:href => url_for('detail', :type=>'node')} #{@db.find(:type=>'node').count} nodes
-    %ul.list
-      %li
-        %a{:href => url_for('group:node_type', :type=>'node')} nodes by type
-      %li
-        %a{:href => url_for('group:file', :type=>'node')} nodes per file
-
-    %h3
-      %a{:href => url_for('detail', :type=>'node',:node_type=>'METHOD')} #{@db.find(:type=>'node',:node_type=>'METHOD').count} methods
-    %ul.list
-      %li
-        %a{:href => url_for('group:file', :type=>'node',:node_type=>'METHOD')} methods per file
-
-    %h3
-      %a{:href => url_for('detail', :type=>'array')} #{@db.find(:type=>'array').count} arrays
-    %ul.list
-      - if array = @db.find_one(:type=>'class',:name=>'Array') and n_sub = @db.find(:super=>array['_id']).count
+          %a{:href => url_for('group:age')} objects by age
         %li
-          %a{:href => url_for('subclasses', :name=>'Array')} #{n_sub} subclasses
-          of
-          %a{:href => url_for('detail', :_id=>array['_id'])} Array
-      - if largest = @db.find({:type=>'array'}, :fields => [:_id, :length]).sort([:length,:desc]).limit(1).first
-        %li
-          %a{:href => url_for('detail', :_id => largest['_id'])} largest array
-          has #{largest['length']} elements
-      %li
-        %a{:href => url_for('group:length', :type=>'array')} group by size
+          %a{:href => url_for('group:type')} objects by type
 
-    %h3
-      %a{:href => url_for('detail', :type=>'hash')} #{@db.find(:type=>'hash').count} hashes
-    %ul.list
-      - if hash = @db.find_one(:type=>'class',:name=>'Hash') and n_sub = @db.find(:super=>hash['_id']).count
+      %h3
+        %a{:href => url_for('detail', :type=>'class')} #{@db.find(:type=>'class').count} classes
+        and
+        %a{:href => url_for('detail', :type=>'module')} #{@db.find(:type=>'module').count} modules
+      %ul.list
         %li
-          %a{:href => url_for('subclasses', :name=>'Hash')} #{n_sub} subclasses
-          of
-          %a{:href => url_for('detail', :_id=>hash['_id'])} Hash
-      - if largest = @db.find({:type=>'hash'}, :fields => [:_id, :length]).sort([:length,:desc]).limit(1).first
+          %a{:href => url_for('namespace')} namespace hierarchy
         %li
-          %a{:href => url_for('detail', :_id => largest['_id'])} largest hash
-          has #{largest['length']} elements
-      %li
-        %a{:href => url_for('group:length', :type=>'hash')} group by size
+          %a{:href => url_for('subclasses')} class hierarchy
+        %li
+          %a{:href => url_for('group:class', :class=>{:$exists=>true})} instances per class
 
-    %h3
-      %a{:href => url_for('detail', :type=>'string')} #{@db.find(:type=>'string').count} strings
-    %ul.list
-      - if str = @db.find_one(:type=>'class',:name=>'String') and n_sub = @db.find(:super=>str['_id']).count
+      %h3
+        - unless files = @dump_metadata['files']
+          - files = @db.distinct(:file).compact
+          - DUMPS.update({:_id => @dump_metadata['_id']}, :$set => {:files => files})
+        %a{:href => url_for('group:file')} #{files.size} source files
+      %ul.list
         %li
-          %a{:href => url_for('subclasses', :name=>'String')} #{n_sub} subclasses
-          of
-          %a{:href => url_for('detail', :_id=>str['_id'])} String
-      - if largest = @db.find({:type=>'string'}, :fields => [:_id, :length]).sort([:length,:desc]).limit(1).first
+          %a{:href => url_for('detail', :file=>'(eval)')} #{@db.find(:file=>'(eval)').count} objects created inside eval
         %li
-          %a{:href => url_for('detail', :_id => largest['_id'])} longest string
-          is #{largest['length']} bytes
-      %li
-        %a{:href => url_for('group:length', :type=>'string')} group by length
+          %a{:href => url_for('detail', :file=>{:$exists=>false})} #{@db.find(:file=>{:$exists=>false}).count} objects missing file information
 
-    %h3
-      %a{:href => url_for('detail', :class_name=>'Proc')} #{@db.find(:class_name=>'Proc').count} procs
-    %ul.list
-      %li
-        %a{:href => url_for('group:nd_body', :type=>'data',:class_name=>'Proc')} group by location
-      %li
-        %a{:href => url_for('detail', :type=>'varmap')} #{@db.find(:type=>'varmap').count} variable maps
+      %h3
+        %a{:href => url_for('detail', :type=>'node')} #{@db.find(:type=>'node').count} nodes
+      %ul.list
+        %li
+          %a{:href => url_for('group:node_type', :type=>'node')} nodes by type
+        %li
+          %a{:href => url_for('group:file', :type=>'node')} nodes per file
 
-    %h3
-      %a{:href => url_for('detail', :class_name=>'Thread')} #{@db.find(:class_name=>'Thread').count} threads
-    %ul.list
-      %li
-        %a{:href => url_for('detail', :class_name=>'Thread',:main=>true)} main thread
-        has #{@db.find_one(:class_name=>'Thread',:main=>true)['variables'].size rescue 0} thread variables
-      %li
-        %a{:href => url_for('detail', :type=>'frame')} #{@db.find(:type=>'frame').count} stack frames
-      %li
-        %a{:href => url_for('detail', :type=>'scope')} #{@db.find(:type=>'scope').count} scopes
+      %h3
+        %a{:href => url_for('detail', :type=>'node',:node_type=>'METHOD')} #{@db.find(:type=>'node',:node_type=>'METHOD').count} methods
+      %ul.list
+        %li
+          %a{:href => url_for('group:file', :type=>'node',:node_type=>'METHOD')} methods per file
+
+      %h3
+        %a{:href => url_for('detail', :type=>'array')} #{@db.find(:type=>'array').count} arrays
+      %ul.list
+        - if array = @db.find_one(:type=>'class',:name=>'Array') and n_sub = @db.find(:super=>array['_id']).count
+          %li
+            %a{:href => url_for('subclasses', :name=>'Array')} #{n_sub} subclasses
+            of
+            %a{:href => url_for('detail', :_id=>array['_id'])} Array
+        - if largest = @db.find({:type=>'array'}, :fields => [:_id, :length]).sort([:length,:desc]).limit(1).first
+          %li
+            %a{:href => url_for('detail', :_id => largest['_id'])} largest array
+            has #{largest['length']} elements
+        %li
+          %a{:href => url_for('group:length', :type=>'array')} group by size
+
+      %h3
+        %a{:href => url_for('detail', :type=>'hash')} #{@db.find(:type=>'hash').count} hashes
+      %ul.list
+        - if hash = @db.find_one(:type=>'class',:name=>'Hash') and n_sub = @db.find(:super=>hash['_id']).count
+          %li
+            %a{:href => url_for('subclasses', :name=>'Hash')} #{n_sub} subclasses
+            of
+            %a{:href => url_for('detail', :_id=>hash['_id'])} Hash
+        - if largest = @db.find({:type=>'hash'}, :fields => [:_id, :length]).sort([:length,:desc]).limit(1).first
+          %li
+            %a{:href => url_for('detail', :_id => largest['_id'])} largest hash
+            has #{largest['length']} elements
+        %li
+          %a{:href => url_for('group:length', :type=>'hash')} group by size
+
+      %h3
+        %a{:href => url_for('detail', :type=>'string')} #{@db.find(:type=>'string').count} strings
+      %ul.list
+        - if str = @db.find_one(:type=>'class',:name=>'String') and n_sub = @db.find(:super=>str['_id']).count
+          %li
+            %a{:href => url_for('subclasses', :name=>'String')} #{n_sub} subclasses
+            of
+            %a{:href => url_for('detail', :_id=>str['_id'])} String
+        - if largest = @db.find({:type=>'string'}, :fields => [:_id, :length]).sort([:length,:desc]).limit(1).first
+          %li
+            %a{:href => url_for('detail', :_id => largest['_id'])} longest string
+            is #{largest['length']} bytes
+        %li
+          %a{:href => url_for('group:length', :type=>'string')} group by length
+
+      %h3
+        %a{:href => url_for('detail', :class_name=>'Proc')} #{@db.find(:class_name=>'Proc').count} procs
+      %ul.list
+        %li
+          %a{:href => url_for('group:nd_body', :type=>'data',:class_name=>'Proc')} group by location
+        %li
+          %a{:href => url_for('detail', :type=>'varmap')} #{@db.find(:type=>'varmap').count} variable maps
+
+      %h3
+        %a{:href => url_for('detail', :class_name=>'Thread')} #{@db.find(:class_name=>'Thread').count} threads
+      %ul.list
+        %li
+          %a{:href => url_for('detail', :class_name=>'Thread',:main=>true)} main thread
+          has #{@db.find_one(:class_name=>'Thread',:main=>true)['variables'].size rescue 0} thread variables
+        %li
+          %a{:href => url_for('detail', :type=>'frame')} #{@db.find(:type=>'frame').count} stack frames
+        %li
+          %a{:href => url_for('detail', :type=>'scope')} #{@db.find(:type=>'scope').count} scopes
