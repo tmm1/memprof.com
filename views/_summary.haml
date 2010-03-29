@@ -70,9 +70,11 @@
           inside
           %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} Object
         %li
-          %a{:href => url_for('group:age')} objects by age
+          %a{:href => url_for('group:age')} objects grouped by age
         %li
-          %a{:href => url_for('group:type')} objects by type
+          %a{:href => url_for('group:type')} objects grouped by type
+        %li
+          %a{:href => url_for('group:refs')} objects with most outbound references
 
       %h3
         %a{:href => url_for('detail', :type=>'class')} #{@db.find(:type=>'class').count} classes

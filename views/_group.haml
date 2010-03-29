@@ -1,12 +1,17 @@
 %ul.grouped
   - list.each do |o|
     %li
-      - w = (where || {}).merge(key => o[key])
+      - unless key == 'refs'
+        - w = (where || {}).merge(key => o[key])
+      - else
+        - w = {'_id' => o['_id']}
 
       %span.num= o['count'].to_i
       %span.val
         %a{:href => url_for('detail', w)}
           - case key
+          - when 'refs'
+            = show_val o['_id']
           - when 'time'
             - diff = time_range.last - o[key]['$gte']
             - diff /= 1000
@@ -33,7 +38,7 @@
           - else
             = o[key] ? show_val(o[key]) : '(unknown)'
 
-      - if possible = possible_groupings_for(w) and possible.any?
+      - if key != 'refs' and possible = possible_groupings_for(w) and possible.any?
         - subkey = possible.first
 
         %ul{:url => url_for("group:#{subkey}", nil, w)}

@@ -365,6 +365,9 @@ class MemprofApp < Sinatra::Base
         end
 
         result.drop
+      elsif key == 'refs'
+        list = @dump.refs.find.sort([:refs_size, :desc]).limit(100).to_a
+        list.each{ |o| o['count'] = o['refs_size'] }
       else
         list = @db.group(
           [key],

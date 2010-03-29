@@ -109,6 +109,7 @@ module Memprof
 
       @refs = @@connection.db('memprof_datasets').collection("#{@name}_refs")
       @refs.create_index(:refs)
+      @refs.create_index(:refs_size)
 
       @root_object = @db.find_one(:type => 'class', :name => 'Object')
     end
