@@ -186,7 +186,7 @@ class MemprofApp < Sinatra::Base
     @dump_metadata = DUMPS.find_one(:_id => (ObjectID(params[:dump]) rescue params[:dump]))
     @dump_user     = USERS.find_one(:_id => @dump_metadata['user_id'])
 
-    if @dump_metadata['state'] == 'imported'
+    if @dump_metadata['status'] == 'imported'
       render_panel(params[:view])
     else
       render_panel('summary')
@@ -543,7 +543,7 @@ class MemprofApp < Sinatra::Base
       end
     end
     def get_dumps
-      dumps = DUMPS.find(:state => 'imported').sort([:created_at, :desc]).to_a
+      dumps = DUMPS.find(:status => 'imported').sort([:created_at, :desc]).to_a
       users = Hash[ *USERS.find.map{ |u| [u['_id'], u] }.flatten(1) ]
       dumps.each{ |d| d['user'] = users[d['user_id']] }
       dumps

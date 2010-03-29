@@ -5,8 +5,8 @@
       %i by #{@dump_user['username']}
       %abbr.timeago{:title => @dump_metadata['created_at'].iso8601}
 
-    - unless @dump_metadata['state'] == 'imported'
-      - if @dump_metadata['state'] == 'pending'
+    - unless @dump_metadata['status'] == 'imported'
+      - if @dump_metadata['status'] == 'pending'
         %h3.centered
           We are currently processing your heap dump.
           %br/
@@ -15,7 +15,7 @@
           %img.spinner{:src => '/demo/spinner.gif'}
 
         %h4.centered
-          You are number #{DUMPS.find(:state => 'pending', :_id => {:$lt => @dump_metadata['_id']}).count + 1} in the queue.
+          You are number #{DUMPS.find(:status => 'pending', :_id => {:$lt => @dump_metadata['_id']}).count + 1} in the queue.
       - else
         %h3.centered
           Something went wrong with this heap dump.
