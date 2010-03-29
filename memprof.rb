@@ -205,6 +205,14 @@ class MemprofApp < Sinatra::Base
     redirect "/"
   end
 
+  get '/users' do
+    throw(:halt, [404, "Not found."]) unless admin?
+
+    @users = USERS.find()
+    @dumps = DUMPS.find()
+    haml :_users, :layout => :newui
+  end
+
   helpers do
     def url_for(subview, where=nil, of=nil)
       url = "/dump/#{@dump.name}/#{subview}"
@@ -543,7 +551,7 @@ class MemprofApp < Sinatra::Base
       end
     end
     def get_dumps
-      if current_user and current_user['admin']
+      if admin?
         dumps = DUMPS.find
       else
         dumps = DUMPS.find(:status => 'imported')
@@ -559,6 +567,9 @@ class MemprofApp < Sinatra::Base
     end
     def current_user
       @_current_user ||= (logged_in? && USERS.find_one(:_id => ObjectID(session[:user_id])) rescue nil)
+    end
+    def admin?
+      current_user && current_user['admin']
     end
 
     include Rack::Utils

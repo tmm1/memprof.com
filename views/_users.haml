@@ -1,0 +1,19 @@
+.panel
+  .content
+    %h2 users
+    %table#users
+      %th Username
+      %th Name
+      %th Email
+      %th Dumps
+      %th User since
+      %th API key
+      - @users.each do |user|
+        %tr
+          %td= user['username']
+          %td= user['name']
+          %td= user['email']
+          %td= @dumps.select{|d| d['user_id'] == user['_id']}.size
+          %td
+            %abbr.timeago{:title => user['created_at'].iso8601}
+          %td= user['api_key']
