@@ -43,8 +43,7 @@ class MemprofApp < Sinatra::Base
       :status => 'pending'
     )
 
-    user['dumps'] << dump_id
-    USERS.save(user)
+    USERS.update({:_id => user['_id']}, :$push => {:dumps => dump_id})
 
     basename = File.expand_path("../dumps/#{dump_id.to_s}", __FILE__)
     tempfile.close
