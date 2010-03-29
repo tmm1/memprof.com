@@ -41,14 +41,21 @@ if true # !File.exists?(refs_file)
   }
 
   parser.parse(File.open(file,'r'))
-  puts 'done!'
+  puts 'refs completed'
   out.close
 end
 
-exit(1) unless system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}")
-exit(1) unless system("mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}")
-exit(1) unless system("mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'")
+puts "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}"
+puts `mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}`
+exit(1) unless $?.exitstatus == 0
+puts "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}"
+puts `mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}`
+exit(1) unless $?.exitstatus == 0
+puts "mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'"
+puts `mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'`
+exit(1) unless $?.exitstatus == 0
 
 require 'memprof.com'
 dump = Memprof::Dump.new(basename)
 
+puts "Import complete!\n\n\n"

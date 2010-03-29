@@ -1,7 +1,6 @@
 require 'setup'
 
 require 'sinatra/base'
-require 'sinatra/async'
 require 'haml'
 require 'sass'
 require 'yajl'
@@ -13,9 +12,8 @@ require 'db'
 require 'memprof.com'
 
 class MemprofApp < Sinatra::Base
-  register Sinatra::Async
 
-  apost '/upload' do
+  post '/upload' do
     upload = params["upload"]
     name   = params["name"]
     key    = params["key"]
@@ -23,21 +21,17 @@ class MemprofApp < Sinatra::Base
     user = USERS.find_one(:api_key => key)
 
     unless user
-      body "Bad API key."
-      return
+      return "Bad API key."
     end
     unless upload && tempfile = upload[:tempfile]
-      body "Failed - no file."
-      return
+      return "Failed - no file."
     end
     unless name && !name.empty?
-      body "Failed - no dump name."
-      return
+      return "Failed - no dump name."
     end
     # Slight deterrent to people uploading bullshit files?
     unless upload[:type] == "application/x-gzip"
-      body "Failed."
-      return
+      return "Failed."
     end
 
     # we need the dump id to use it as the collection name for the dump import.
@@ -45,41 +39,18 @@ class MemprofApp < Sinatra::Base
     dump_id = DUMPS.insert(
       :name => name,
       :user_id => user['_id'],
-      :created_at => Time.now
+      :created_at => Time.now,
+      :status => 'pending'
     )
 
-    basename = File.expand_path("../dumps/#{dump_id.to_s}", __FILE__)
-    storage_name = File.expand_path("../stored_dumps/#{dump_id.to_s}.json.gz", __FILE__)
+    user['dumps'] << dump_id
+    USERS.save(user)
 
+    basename = File.expand_path("../dumps/#{dump_id.to_s}", __FILE__)
     tempfile.close
     File.rename(tempfile.path, "#{basename}.json.gz")
-    File.copy("#{basename}.json.gz", storage_name)
 
-    EM.system("gunzip -f #{basename}.json.gz") {|o1, s1|
-      if s1.exitstatus == 0
-        EM.system("ruby import_json.rb #{basename}.json") {|o2, s2|
-          if s2.exitstatus == 0
-            (user['dumps'] ||= []) << dump_id
-            USERS.save(user)
-            body "Success! Visit http://www.memprof.com/dump/#{dump_id.to_s} to view."
-          else
-            # make sure we remove the dump if it failed
-            DUMPS.remove(:_id => dump_id)
-            # dont store a compressed copy if it failed
-            File.delete(storage_name)
-            body "Failed to import your file!"
-          end
-          File.delete("#{basename}.json") if File.exists?("#{basename}.json")
-          File.delete("#{basename}_refs.json") if File.exists?("#{basename}_refs.json")
-        }
-      else
-        # make sure we remove the dump if it failed
-        DUMPS.remove(:_id => dump_id)
-        File.delete("#{basename}.json.gz") if File.exist?("#{basename}.json.gz")
-        File.delete(storage_name)
-        body "Failed to decompress your file!"
-      end
-    }
+    "Success!"
   end
 
   get %r'/(demo|panel)$' do
