@@ -1,10 +1,11 @@
 %ul.dumps_list
-  - user = logged_in? && current_user
-  - get_dumps().each do |dump|
+  - user = current_user
+  - get_dumps.each do |dump|
     %li
+      - if user && user['admin']
+        %form.delete{:action => "/delete_dump/#{dump['_id'].to_s}", :method => :post, :onSubmit => 'return confirm("ARE YOU SURE YOU WANNA DELETE THIS BRO?");', :style => 'display: none'}
+          %input{:type => 'submit', :name => 'submit', :value => 'Delete'}
+
       %a{:href => "/dump/#{dump['_id']}"} #{dump['name']}
       %i by #{dump['user']['username']}
       %abbr.timeago{:title => dump['created_at'].iso8601}
-      - if user && user['admin']
-        %form{:action => "/delete_dump/#{dump['_id'].to_s}", :method => :post, :onSubmit => 'return confirm("ARE YOU SURE YOU WANNA DELETE THIS BRO?");'}
-          %input{:type => 'submit', :name => 'submit', :value => 'Delete'}

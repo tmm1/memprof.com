@@ -183,6 +183,14 @@ var findClosestPanel = function(){
   return showPanel;
 };
 
+$('ul.dumps_list li').live('mouseover mouseout', function(event){
+  if (event.type == 'mouseover') {
+    $(this).find('form.delete').show();
+  } else {
+    $(this).find('form.delete').hide();
+  }
+});
+
 $('ul.nav li a:not(.popout)').live('click', function(){
   var link = $(this);
   var nav = $(this).parents('ul.nav:first');
