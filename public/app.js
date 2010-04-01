@@ -245,14 +245,23 @@ $('ul.nav li a:not(.popout)').live('click', function(){
 });
 
 $('form#signup, form#login').live('submit', function(){
-  $(this).ajaxSubmit({
+  var form = $(this);
+  var submit = form.find('input[type="submit"]');
+
+  if (submit.attr('disabled'))
+    return false;
+  submit.attr('disabled', 'disabled');
+
+  form.ajaxSubmit({
     success: function(responseText, statusText) {
       window.location.reload(true);
     },
     error: function (obj) {
       alert(obj.responseText);
+      submit.removeAttr('disabled');
     }
   });
+
   return false;
 });
 
