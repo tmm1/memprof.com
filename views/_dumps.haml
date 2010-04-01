@@ -2,7 +2,14 @@
   - if current_user
     %h3 Your Private Heap Dumps (<a class='enable_private' href='#'>request private access</a>)
     %ul.dumps_list
-      None.
+      - dumps = get_private_dumps
+      - if dumps.any?
+        - dumps.each do |dump|
+          %li
+            %a{:href => "/dump/#{dump['_id']}"} #{dump['name']}
+            %abbr.timeago{:title => dump['created_at'].iso8601}
+      - else
+        None.
 
   %h3{:class => current_user && 'logged_in'}
     Recent Public Heap Dumps (<a class='facebox', href='/howto'>upload new</a>)

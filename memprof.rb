@@ -156,6 +156,8 @@ class MemprofApp < Sinatra::Base
     pass unless @dump_metadata = DUMPS.find_one(:_id => (ObjectID(params[:dump]) rescue params[:dump]))
     @dump_user     = USERS.find_one(:_id => @dump_metadata['user_id'])
 
+    pass if @dump_metadata['private'] and !admin? and (current_user.nil? or @dump_metadata['user_id'] != current_user['_id'])
+
     if @dump_metadata['status'] == 'imported'
       @dump = Memprof::Dump.new(@dump_metadata['_id'].to_s)
       @db = @dump.db
@@ -166,7 +168,7 @@ class MemprofApp < Sinatra::Base
   end
 
   post '/delete_dump/:dump' do
-    throw(:halt, [404, "Not found."]) unless logged_in? && current_user['admin']
+    throw(:halt, [404, "Not found."]) unless logged_in? && admin?
 
     dump = DUMPS.find_one(:_id => ObjectID(params[:dump])) rescue nil
     throw(:halt, [404, "Can't find this dump bro."]) unless dump
@@ -524,11 +526,20 @@ class MemprofApp < Sinatra::Base
         val
       end
     end
+    def get_private_dumps
+      dumps = DUMPS.find(:user_id => current_user['_id'], :private => true)
+      dumps = dumps.sort([:created_at, :desc]).to_a
+      users = Hash[ *USERS.find.map{ |u| [u['_id'], u] }.flatten(1) ]
+      dumps.each{ |d| d['user'] = users[d['user_id']] }
+      dumps
+    end
     def get_dumps
-      if admin?
-        dumps = DUMPS.find
-      else
-        dumps = DUMPS.find(:status => 'imported')
+      dumps = DUMPS.find
+      unless admin?
+        dumps.selector.update(
+          :status => 'imported',
+          :private => {:$ne => true}
+        )
       end
 
       dumps = dumps.sort([:created_at, :desc]).to_a
