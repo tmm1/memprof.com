@@ -5,7 +5,7 @@
         %td.label
           %label{:for => 'login'} Username
         %td
-          %input{:id => 'login', :type => 'text', :name => 'login', :placeholder => 'username or email address', :value => params[:login] || '', :maxlength=>256}
+          %input{:id => 'login', :type => 'text', :name => 'login', :placeholder => 'username or email address', :value => params[:login] || '', :maxlength=>256, :autofocus=>'autofocus'}
       %tr
         %td.label
           %label{:for => 'password'} Password

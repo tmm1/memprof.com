@@ -191,6 +191,13 @@ $('ul.dumps_list li').live('mouseover mouseout', function(event){
   }
 });
 
+$('a.enable_private').live('click', function(){
+  $.get('/beta', function(){
+    $.facebox("<h3 class='centered'>Thanks. We'll let you know when more private beta invites are available.</h3>");
+  });
+  return false;
+});
+
 $('a.facebox').live('click', function(){
   $.facebox({ajax: this.href});
   return false;

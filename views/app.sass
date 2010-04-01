@@ -4,18 +4,22 @@
 .float_right
   float: right
 
-ul.dumps_list
-  margin-left: 2em
-  width: 400px
-  abbr
-    color: #ccc
-    font-size: 0.8em
-  li
-    form.delete
-      float: right
-      input
-        height: 10px
-        margin-left: 8px
+.dumps
+  ul.dumps_list
+    margin-left: 2em
+    width: 400px
+    abbr
+      color: #ccc
+      font-size: 0.8em
+    li
+      form.delete
+        float: right
+        input
+          height: 10px
+          margin-left: 8px
+
+  h3.logged_in
+    margin-top: 2.5em
 
 .faq
   width: 500px
@@ -88,6 +92,7 @@ ul.dumps_list
       border: none
       &.first
         border-left: 1px solid #ccc
+        border-right: 1px solid #ccc
       &.last
         border-right: 1px solid #ccc
     tr.last

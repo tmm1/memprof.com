@@ -40,7 +40,8 @@
         - if script
           %li
             executing
-            %a{:href => url_for('detail', :_id => script['_id'])}= script['data'].split('/').last(3).join('/')
+            %a{:href => url_for('group:type', :file => script['data'])}
+              = script['data'].split('/').last(3).join('/')
         - if config = @db.find_one(:type=>'module',:name=>'Config')
           %li
             - vars = @db.find_one(:_id => config['ivars'].find{ |k,v| k =~ /CONFIG/ }.last)

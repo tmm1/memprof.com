@@ -12,7 +12,6 @@ require 'db'
 require 'memprof.com'
 
 class MemprofApp < Sinatra::Base
-
   post '/upload' do
     upload = params["upload"]
     name   = params["name"]
@@ -60,43 +59,19 @@ class MemprofApp < Sinatra::Base
     haml :_home, :layout => :newui
   end
 
-  get '/howto' do
-    if request.xhr?
-      partial :_howto
-    else
-      session[:show_howto] = true
-      redirect '/'
-    end
+  get '/beta' do
+    USERS.update({:_id => current_user['_id']}, :$set => {:requested_beta_at => Time.now})
+    'done'
   end
 
-  get '/pricing' do
-    partial :_pricing
-  end
-
-  get '/contact' do
-    if request.xhr?
-      partial :_contact
-    else
-      session[:show_contact] = true
-      redirect '/'
-    end
-  end
-
-  get '/faq' do
-    if request.xhr?
-      partial :_faq
-    else
-      session[:show_faq] = true
-      redirect '/'
-    end
-  end
-
-  get '/signup' do
-    if request.xhr?
-      partial :_signup
-    else
-      session[:show_signup] = true
-      redirect '/'
+  %w[ signup howto login contact faq pricing ].each do |facebox|
+    get "/#{facebox}" do
+      if request.xhr?
+        partial :"_#{facebox}"
+      else
+        session[:"show_#{facebox}"] = true
+        redirect '/'
+      end
     end
   end
 
@@ -381,7 +356,7 @@ class MemprofApp < Sinatra::Base
           where,
           {:count=>0},
           'function(d,o){ o.count++ }'
-        ).sort_by{ |o| -o['count'] }.first(100)
+        ).sort_by{ |o| -o['count'] }.first(250)
       end
 
       partial :_group,

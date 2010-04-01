@@ -1,16 +1,19 @@
-%h3.float_right
-  %a.facebox{:href => '/howto'} Upload yours now!
+.dumps
+  - if current_user
+    %h3 Your Private Heap Dumps (<a class='enable_private' href='#'>request private access</a>)
+    %ul.dumps_list
+      None.
 
-%h3 Recent Heap Dumps
-%ul.dumps_list
-  - user = current_user
-  - get_dumps.each do |dump|
-    %li
-      - if user && user['admin']
-        %form.delete{:action => "/delete_dump/#{dump['_id'].to_s}", :method => :post, :onSubmit => 'return confirm("ARE YOU SURE YOU WANNA DELETE THIS BRO?");', :style => 'display: none'}
-          %input{:type => 'submit', :name => 'submit', :value => 'Delete'}
+  %h3{:class => current_user && 'logged_in'}
+    Recent Public Heap Dumps (<a class='facebox', href='/howto'>upload new</a>)
+  %ul.dumps_list
+    - user = current_user
+    - get_dumps.each do |dump|
+      %li
+        - if user && user['admin']
+          %form.delete{:action => "/delete_dump/#{dump['_id'].to_s}", :method => :post, :onSubmit => 'return confirm("ARE YOU SURE YOU WANNA DELETE THIS BRO?");', :style => 'display: none'}
+            %input{:type => 'submit', :name => 'submit', :value => 'Delete'}
 
-      %a{:href => "/dump/#{dump['_id']}"} #{dump['name']}
-      %i by #{dump['user']['username']}
-      %abbr.timeago{:title => dump['created_at'].iso8601}
-
+        %a{:href => "/dump/#{dump['_id']}"} #{dump['name']}
+        %i by #{dump['user']['username']}
+        %abbr.timeago{:title => dump['created_at'].iso8601}
