@@ -554,7 +554,7 @@ class MemprofApp < Sinatra::Base
   set :port, 7006
   set :public, File.expand_path('../public', __FILE__)
   enable :static, :logging
-  use Rack::Session::Cookie, :key => 'memprof_session', :secret => 'noisses_forpmem'
+  use Rack::Session::Cookie, :key => 'memprof_session', :secret => 'noisses_forpmem', :expire_after => 2592000
 end
 
 if __FILE__ == $0
