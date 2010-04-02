@@ -21,6 +21,6 @@
           %form.delete{:action => "/delete_dump/#{dump['_id'].to_s}", :method => :post, :onSubmit => 'return confirm("ARE YOU SURE YOU WANNA DELETE THIS BRO?");', :style => 'display: none'}
             %input{:type => 'submit', :name => 'submit', :value => 'Delete'}
 
-        %a{:href => "/dump/#{dump['_id']}"} #{dump['name']}
+        %a{:href => "/dump/#{dump['_id']}", :class => dump['private'] && 'private'} #{dump['name']}
         %i by #{dump['user']['username']}
         %abbr.timeago{:title => dump['created_at'].iso8601}

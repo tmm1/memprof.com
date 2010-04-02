@@ -39,7 +39,8 @@ class MemprofApp < Sinatra::Base
       :name => name,
       :user_id => user['_id'],
       :created_at => Time.now,
-      :status => 'pending'
+      :status => 'pending',
+      :private => user['beta'] ? true : false
     )
 
     USERS.update({:_id => user['_id']}, :$push => {:dumps => dump_id})
