@@ -1,6 +1,9 @@
 .dumps
   - if current_user
-    %h3 Your Private Heap Dumps (<a class='enable_private' href='#'>request private access</a>)
+    %h3
+      Your Private Heap Dumps
+      - unless current_user['beta']
+        (<a class='enable_private' href='#'>request private access</a>)
     %ul.dumps_list
       - dumps = get_private_dumps
       - if dumps.any?
