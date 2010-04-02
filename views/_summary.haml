@@ -27,7 +27,9 @@
       - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
       - desc = @db.find_one(:_id => ruby)
       - globals = @db.find_one(:_id=>'globals')
-      - script = @db.find_one(:_id => globals['variables'].find{ |k,v| k == ":$0" }.last)
+      - arg0 = globals['variables'].find{ |k,v| k == ":$0" }
+      - if arg0
+        - script = @db.find_one(:_id => arg0.last)
       %h3
         - if bin = @db.find_one(:_id=>'lsof:2')
           %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
