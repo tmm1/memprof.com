@@ -2,7 +2,9 @@
   - if current_user
     %h3
       Your Private Heap Dumps
-      - unless current_user['beta']
+      - if current_user['beta']
+        (<a class='facebox', href='/howto'>upload new</a>)
+      - else
         (<a class='enable_private' href='#'>request private access</a>)
     %ul.dumps_list
       - dumps = get_private_dumps
@@ -15,7 +17,9 @@
         None.
 
   %h3{:class => current_user && 'logged_in'}
-    Recent Public Heap Dumps (<a class='facebox', href='/howto'>upload new</a>)
+    Recent Public Heap Dumps
+    - unless current_user['beta']
+      (<a class='facebox', href='/howto'>upload new</a>)
   %ul.dumps_list
     - user = current_user
     - get_dumps.each do |dump|
