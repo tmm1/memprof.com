@@ -14,6 +14,11 @@
           %br/
           %img.spinner{:src => '/demo/spinner.gif'}
 
+          :javascript
+            setTimeout(function(){
+              $('a.current:last').click();
+            }, 30000)
+
         %h4.centered
           You are number #{DUMPS.find(:status => 'pending', :_id => {:$lt => @dump_metadata['_id']}).count + 1} in the queue.
       - else
