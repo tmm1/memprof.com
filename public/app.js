@@ -150,6 +150,15 @@ var centerPanel = function(panel, to_top) {
     to_top = true;
   }
 
+  // console.log([
+  //   "position=",
+  //   [panel.position().left, panel.position().top],
+  //   " x/y=",
+  //   [x, y],
+  //   " offset=",
+  //   [window.pageXOffset, window.pageYOffset]
+  // ]);
+
   if (window.pageYOffset > bottom && !to_top && y == 0)
     to_top = true;
 
@@ -157,10 +166,12 @@ var centerPanel = function(panel, to_top) {
     scrollingTo = false;
   }
 
-  if (to_top || y > 0)
-    $.scrollTo({left:x, top:y}, 'fast', {queue:false, onAfter:after});
-  else
-    $.scrollTo(x, 'fast', {axis:'x', onAfter:after});
+  if (!navigator.userAgent.match(/WebKit.*Mobile/)) {
+    if (to_top || y > 0)
+      $.scrollTo({left:x, top:y}, 'fast', {queue:false, onAfter:after});
+    else
+      $.scrollTo(x, 'fast', {axis:'x', onAfter:after});
+  }
 };
 
 var findClosestPanel = function(){
