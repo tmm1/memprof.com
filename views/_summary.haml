@@ -83,6 +83,9 @@
           %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} #{@dump.root_object['ivars'].select{|c,v| c =~ /^[A-Z]/ }.size} constants
           inside
           %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} Object
+        - if finalizers = @db.find_one(:_id => 'finalizers')
+          %li
+            %a{:href => url_for('detail', :_id => 'finalizers')} #{finalizers['data'].size} finalizers
         %li
           %a{:href => url_for('group:age')} objects grouped by age
         %li
@@ -101,6 +104,8 @@
           %a{:href => url_for('subclasses')} class hierarchy
         %li
           %a{:href => url_for('group:class', :class=>{:$exists=>true})} instances per class
+        %li
+          %a{:href => url_for('group:name', :type=>'class')} duplicate classes by name
 
       %h3
         - unless files = @dump_metadata['files']

@@ -3,7 +3,7 @@
   %pre $ gem install memprof
 
   %h2 Then, in your application to be profiled (before anything else)
-  %pre require `gem which memprof/signal`
+  %pre require `gem which memprof/signal`.chomp
 
   %h2 Finally
   %pre=h "$ memprof --pid <pid> --name <dump name> --key #{logged_in? ? current_user['api_key'] : '<api key>'}"

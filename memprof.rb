@@ -190,6 +190,12 @@ class MemprofApp < Sinatra::Base
     haml :_users, :layout => :newui
   end
 
+  get '/enable_beta/:id' do
+    throw(:halt, [404, "Not found."]) unless admin?
+
+    USERS.update({:_id => ObjectID(params[:id])}, :$set => {:beta => true})
+  end
+
   helpers do
     def url_for(subview, where=nil, of=nil)
       url = "/dump/#{@dump.name}/#{subview}"
@@ -428,7 +434,7 @@ class MemprofApp < Sinatra::Base
       case val
       when nil
         'nil'
-      when OrderedHash, /^0x/, 'globals', /^lsof/
+      when OrderedHash, /^0x/, 'globals', 'finalizers', /^lsof/
         if val.is_a?(OrderedHash)
           obj = val
         else

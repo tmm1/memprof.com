@@ -122,7 +122,7 @@
         %td.key= key =~ /^:/ ? key[1..-1] : show_val(key)
         %td.val= show_val val
 
-  - if %w[ hash varmap ].include?(obj['type']) and list = obj['data'] and list.any?
+  - if %w[ hash varmap finalizers ].include?(obj['type']) and list = obj['data'] and list.any?
     %tr.spacer.hash_data
     - list.sort_by{|k,v| k}.first(200).each do |key,val|
       %tr
