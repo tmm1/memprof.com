@@ -1,0 +1,134 @@
+!!!
+%html
+  %head
+    %title hotspots
+    %style{:type => 'text/css'}
+      :sass
+        body
+          font-family: monaco sans-serif
+
+        form.sorter
+          padding: 5px
+          margin-bottom: 1em
+          text-align: center
+
+        table.stats
+          border-collapse: collapse
+          width: 100%
+          td.none
+            color: #ccc
+          th
+            border-right: 1px solid #999
+            border-bottom: 1px solid #999
+            padding: 6px
+
+            a
+              color: #33e
+          tr:hover td
+            //background-color: #eee
+          tbody
+            td
+              padding: 4px 8px
+              text-align: center
+              vertical-align: middle
+              border-bottom: 1px solid #999
+
+          td.graph
+            border-bottom: none
+          td.action
+            text-align: left
+            height: 50px
+          td.min, td.max, td.avg
+            text-align: right
+          td.none
+            text-align: center
+
+          td.min
+            padding-left: 25px
+            border-left: 1px solid #999
+          td.max
+            padding-right: 25px
+            border-right: 1px solid #999
+          td.min, td.max
+            font-size: 0.8em
+            color: #aaa
+          td.avg
+            font-size: 1em !important
+            font-weight: bold
+            padding-right: 0
+          td.num
+            color: #ccc
+            font-size: 0.6em
+            padding-left: 5px
+            padding-right: 0
+          td.single, td.graph
+            text-align: center
+
+  %body
+    :ruby
+      stats = [
+        [ 'time', 'total time', '%.3f' ],
+        [ 'objects_created', '# objs created', '%d' ],
+        [ 'gc_time', 'time in GC', '%.3f' ],
+        [ 'mysql_time', 'time in mysql queries', '%.3f' ],
+        [ 'memcache_get_responses_notfound', 'memcache misses', '%d' ]
+      ]
+
+    %form.sorter{:action => ''}
+      sort by
+      %select{:name => 'sort'}
+        - stats.each do |key, name|
+          %option{:value => key, :selected => key == params[:sort]}= name
+      %select{:name => 'subsort'}
+        - %w[ avg min median max q1 q2 count ].each do |metric|
+          %option{:selected => params[:subsort] == metric}= metric
+      %select{:name => 'direction'}
+        %option desc
+        %option{:selected => params[:direction] == 'asc'} asc
+      %input{:type => 'submit'}
+
+    %table.stats
+      %thead
+        %tr
+          %th.action action
+          - stats.each do |key, name, format|
+            %th{:colspan => 4}= name
+            -#  %a{:href => "?sort=#{key}"}= name
+      %tbody
+        - @result.find.sort(["value.#{params[:sort] || 'time'}.#{params[:subsort] || 'avg'}", params[:direction] == 'asc' ? :asc : :desc]).limit(25).each do |row|
+          %tr
+            %td.action{:rowspan => 2}= row['_id']
+            - stats.each do |key, name, format|
+              - data = row['value'][key]
+              %td.min.max.graph{:colspan => 4}
+                - if data['count'] > 4
+                  .boxplot{:title => data_format(data['median'], format), :data => {:box => Yajl.dump([data['min'], data['q1'], data['median'], data['q2'], data['max']]), :avg => data['avg']}}
+          %tr
+            - stats.each do |key, name, format|
+              - data = row['value'][key]
+              - if data['count'] > 0
+                %td.min= data_format(data['min'], format) unless data['count'] == 1
+                %td.avg= data_format(data['avg'], format)
+                %td.num x #{data['count'].to_i}
+                %td.max= data_format(data['max'], format) unless data['count'] == 1
+              - else
+                %td.min.max.none{:colspan=>4} no data
+
+    %script{:type => 'text/javascript', :src => '/jquery.min.js'}
+    %script{:type => 'text/javascript', :src => '/jquery.sparkline.min.js'}
+    :javascript
+      $(function(){
+        $('.boxplot').each(function(){
+          var plot = $(this)
+          plot.sparkline(
+            $.parseJSON(plot.attr('data-box')),
+            {
+              type:'box',
+              raw:true,
+              showOutliers:false,
+              width:180,
+              target:parseFloat(plot.attr('data-avg'))
+            }
+          )
+        })
+      })
