@@ -1,0 +1,2 @@
+require 'securerandom'
+require 'bcrypt'
