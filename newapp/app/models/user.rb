@@ -1,5 +1,6 @@
 class User
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :username
   field :name
@@ -7,7 +8,8 @@ class User
   field :encrypted_password
   field :ip
   field :api_key, :default => SecureRandom.hex(8)
-  field :created_at, :type => Time, :default => Time.now
+  field :admin, :type => Boolean, :default => false
+  embeds_many :dumps
 
   validates_presence_of :username, :name, :email, :encrypted_password, :api_key
 
@@ -18,8 +20,8 @@ class User
 
   before_validation :encrypt_password
 
-  def dumps
-    Dump.find(:all, :conditions => { :user_id => self.id })
+  def is_admin?
+    admin
   end
 
   def encrypt_password

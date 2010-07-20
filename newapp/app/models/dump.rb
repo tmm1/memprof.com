@@ -1,11 +1,10 @@
 class Dump
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :name
-  field :user_id
   field :status, :default => 'pending'
   field :private, :type => Boolean, :default => true
-  field :created_at, :type => Time, :default => Time.now
+  embedded_in :user, :inverse_of => :dumps
 
-  validates_presence_of :user_id
 end

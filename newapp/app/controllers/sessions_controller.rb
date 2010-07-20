@@ -13,7 +13,11 @@ class SessionsController < ApplicationController
       session[:user_id] = user.id
       redirect_to_target_or_default('/')
     else
-      render :partial => 'new'
+      if request.xhr?
+        render :text => "Login incorrect.", :status => 403
+      else
+        render :partial => 'new'
+      end
     end
   end
 
