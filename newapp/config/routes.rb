@@ -1,6 +1,10 @@
 Memprof::Application.routes.draw do |map|
-  map.resources :users
-  map.resources :sessions
+  resources :users
+  resources :sessions
+  resources :dumps
+
+  # Support the old memprof client for now, I guess
+  match '/upload' => 'dumps#create', :via => :post
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
