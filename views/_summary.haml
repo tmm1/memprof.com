@@ -29,8 +29,9 @@
           for help.
 
     - else
-      - ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }.last
-      - desc = @db.find_one(:_id => ruby)
+      - if ruby = @dump.root_object['ivars'].find{ |k,v| k =~ /RUBY_DESCR/ }
+        - ruby = ruby.last
+        - desc = @db.find_one(:_id => ruby)
       - globals = @db.find_one(:_id=>'globals')
       - arg0 = globals['variables'].find{ |k,v| k == ":$0" }
       - if arg0
@@ -38,10 +39,10 @@
       %h3
         - if bin = @db.find_one(:_id=>'lsof:2')
           %a{:href => url_for('detail', :_id=>'lsof:2')} #{bin['fd_name'].split('/').last(3).join('/')}
-        - else
+        - elsif desc
           %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
       %ul.list
-        - if bin
+        - if bin and desc
           %li
             %a{:href => url_for('detail', :_id=>ruby)}= desc['data']
         - if script
