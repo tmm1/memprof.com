@@ -43,9 +43,9 @@ if true # !File.exists?(refs_file)
   out.close
 end
 
-sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}"
-sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}"
-sh "mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'"
+sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}      --file #{file}" rescue nil
+sh "mongoimport -h localhost -d memprof_datasets --drop -c #{basename}_refs --file #{refs_file}" rescue nil
+sh "mongo localhost/memprof_datasets --eval 'db[\"#{basename}_groups\"].drop()'" rescue nil
 
 puts "creating indexes"
 require 'memprof.com'
