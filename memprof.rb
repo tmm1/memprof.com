@@ -434,8 +434,8 @@ class MemprofApp < Sinatra::Base
       case val
       when nil
         'nil'
-      when OrderedHash, /^0x/, 'globals', 'finalizers', /^lsof/
-        if val.is_a?(OrderedHash)
+      when /^0x/, 'globals', 'finalizers', /^lsof/, BSON::OrderedHash
+        if val.is_a?(BSON::OrderedHash)
           obj = val
         else
           obj = @db.find_one(:_id => val)

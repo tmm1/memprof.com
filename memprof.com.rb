@@ -7,7 +7,7 @@ require 'unified_ruby'
 
 # $DEBUG=true
 
-class OrderedHash
+class BSON::OrderedHash
   %w[ n1 n2 n3 ].each do |node|
     class_eval <<-EOS, __FILE__, __LINE__+1
       def #{node}
@@ -169,7 +169,7 @@ module Memprof
         locals = []
       end
 
-      obj = @db.find_one(:_id => obj) unless obj.is_a?(OrderedHash)
+      obj = @db.find_one(:_id => obj) unless obj.is_a?(BSON::OrderedHash)
       tree = []
 
       return tree unless obj
