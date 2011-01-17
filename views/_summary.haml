@@ -33,7 +33,7 @@
         - ruby = ruby.last
         - desc = @db.find_one(:_id => ruby)
       - globals = @db.find_one(:_id=>'globals')
-      - arg0 = globals['variables'].find{ |k,v| k == ":$0" }
+      - arg0 = globals['variables'].find{ |k,v| k == ":$0" } if globals
       - if arg0
         - script = @db.find_one(:_id => arg0.last)
       %h3
@@ -79,7 +79,7 @@
         %a{:href => url_for('detail', {})} #{@db.count} objects
       %ul.list
         %li
-          %a{:href => url_for('detail', :_id => 'globals')} #{@db.find_one(:_id=>'globals')['variables'].size} global variables
+          %a{:href => url_for('detail', :_id => 'globals')} #{@db.find_one(:_id=>'globals')['variables'].size rescue 0} global variables
         %li
           %a{:href => url_for('detail', :_id => @dump.root_object['_id'])} #{@dump.root_object['ivars'].select{|c,v| c =~ /^[A-Z]/ }.size} constants
           inside
