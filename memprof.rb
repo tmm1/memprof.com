@@ -534,14 +534,14 @@ class MemprofApp < Sinatra::Base
       end
     end
     def get_private_dumps
-      dumps = DUMPS.find(:user_id => current_user['_id'], :private => true)
+      dumps = DUMPS.find(:user_id => current_user['_id'], :private => true, :status => {:$ne => 'old'})
       dumps = dumps.sort([:created_at, :desc]).to_a
       users = Hash[ *USERS.find.map{ |u| [u['_id'], u] }.flatten(1) ]
       dumps.each{ |d| d['user'] = users[d['user_id']] }
       dumps
     end
     def get_dumps
-      dumps = DUMPS.find
+      dumps = DUMPS.find(:status => {:$ne => 'old'})
       unless admin?
         dumps.selector.update(
           :status => 'imported',
