@@ -13,6 +13,7 @@ class Regexp
   end
 end
 
+require 'sequel'
 require 'sequel/extensions/pretty_table'
 
 class Mongo::Collection
