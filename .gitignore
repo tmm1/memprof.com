@@ -2,3 +2,5 @@
 .bundle/*
 .sass-cache
 log/*.log
+dumps/*.gz
+stored_dumps/*.gz
