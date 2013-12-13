@@ -204,7 +204,7 @@ class MemprofApp < Sinatra::Base
         url += "where=#{Yajl.dump where}" if where
         url += "of=#{Yajl.dump of}" if of
       end
-      url
+      URI.encode(url)
     end
     def render_panel(subview=nil)
       where = (params[:where] && !params[:where].empty? ? Yajl.load(params[:where]) : nil)

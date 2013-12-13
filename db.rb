@@ -4,7 +4,7 @@ CONN = Mongo::Connection.new
 DB = CONN.db('memprof_site')
 
 def ObjectID(str)
-  BSON::ObjectID.from_string(str)
+  BSON::ObjectId.from_string(str)
 end
 
 class Regexp
@@ -13,6 +13,7 @@ class Regexp
   end
 end
 
+require 'sequel'
 require 'sequel/extensions/pretty_table'
 
 class Mongo::Collection
